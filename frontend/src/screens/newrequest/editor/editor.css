@@ -1,0 +1,609 @@
+/*
+ * The letter as a page (P19c): the same idea as the server's page CSS in drafting/render.py,
+ * so what is edited here is what the PDF prints. The font, size and margin come in as custom
+ * properties from the letterhead; the UI chrome around the page (handles, menus, chips) uses the
+ * portal's own tokens, restyled to stage 2 as 045 draws it (P20g). The page is scaled to the
+ * screen's 784 px (Preview.tsx `useFitScale`), which hands the scale down as `--page-scale`:
+ * the chrome divides its pixel sizes by it, so a chip is 10.5 px on the screen at any scale.
+ */
+
+.letter-page {
+  --letter-font: 'Times New Roman';
+  --letter-size: 12pt;
+  --letter-margin: 1in;
+  position: relative;
+  width: 8.5in;
+  /* As tall as the letter, as 045 draws the page; the PDF keeps its sheets. */
+  margin: 0 auto;
+  padding: var(--letter-margin);
+  box-sizing: border-box;
+  background: var(--color-card-white);
+  color: var(--color-letter-ink);
+  font-family: var(--letter-font), var(--font-letter);
+  font-size: var(--letter-size);
+  line-height: 1.35;
+  box-shadow: var(--shadow-page);
+}
+
+.letter-page p {
+  margin: 0 0 0.6em;
+}
+.letter-page h1,
+.letter-page h2,
+.letter-page h3,
+.letter-page h4 {
+  margin: 0.6em 0 0.3em;
+  font-size: inherit;
+  font-weight: bold;
+}
+.letter-page h2 {
+  font-size: 1.15em;
+}
+.letter-page ul,
+.letter-page ol {
+  margin: 0 0 0.6em;
+  padding-left: 1.6em;
+}
+.letter-page blockquote {
+  margin: 0 0 0.6em 1.5em;
+}
+.letter-page hr {
+  border: 0;
+  border-top: 1px solid currentColor;
+  margin: 0.8em 0;
+}
+.letter-page table {
+  border-collapse: collapse;
+  margin: 0.6em 0;
+}
+.letter-page td,
+.letter-page th {
+  border: 1px solid currentColor;
+  padding: 0.2em 0.4em;
+  min-width: 2em;
+  vertical-align: top;
+}
+.letter-page th {
+  font-weight: bold;
+}
+.letter-page .selectedCell {
+  background: var(--color-brand-tint);
+}
+
+/* The seal: the letterhead's image, or where one would go. */
+.letter-page .seal {
+  display: block;
+  width: 1.1in;
+  margin-bottom: 0.4em;
+}
+.letter-page .seal.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+.letter-page .seal-empty {
+  height: 1.1in;
+  border: 1px dashed var(--color-line-2);
+  border-radius: 50%;
+}
+
+.letter-page .letterhead {
+  margin-bottom: 1em;
+}
+.letter-page .letterhead p {
+  margin: 0;
+}
+
+/* Placeholder chips (045): the same name the server fills in, on the chip ground with its 1 px
+   line, 4 px round, DM Sans 10.5 px 500 in the brand. */
+.chip {
+  display: inline;
+  padding: 0 calc(4px / var(--page-scale, 1));
+  border: calc(1px / var(--page-scale, 1)) solid var(--color-blue-line-soft);
+  border-radius: calc(var(--radius-4) / var(--page-scale, 1));
+  background: var(--color-blue-tint-2);
+  color: var(--color-brand);
+  font-family: var(--font-ui);
+  font-size: calc(var(--text-105) / var(--page-scale, 1));
+  font-weight: 500;
+  letter-spacing: 0;
+  white-space: nowrap;
+  user-select: none;
+}
+.ProseMirror .chip.ProseMirror-selectednode {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 1px;
+}
+
+sup.fn {
+  font-size: 70%;
+  vertical-align: super;
+  line-height: 0;
+}
+.ProseMirror sup.fn.ProseMirror-selectednode {
+  outline: 2px solid var(--color-brand);
+}
+
+/* "page 1 of 3" under the footnotes, inside the page (045): Libre Franklin 9.5 px, muted. */
+.letter-page .page-count {
+  margin: calc(14px / var(--page-scale, 1)) 0 0;
+  color: var(--color-muted);
+  font-family: var(--font-display);
+  font-size: calc(var(--text-xxs) / var(--page-scale, 1));
+  line-height: normal;
+  text-align: center;
+}
+
+.letter-page .subject {
+  display: flex;
+  gap: 0.3em;
+  margin: 0.8em 0;
+  font-weight: bold;
+}
+.letter-page .subject input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+}
+
+/* The letterhead's parts are read-only here; a hint says where they are edited. */
+.shell-part {
+  position: relative;
+}
+.shell-part .shell-hint {
+  position: absolute;
+  top: -1.4em;
+  right: 0;
+  padding: 1px 6px;
+  border-radius: var(--radius-6);
+  background: var(--color-page);
+  color: var(--color-ink-3);
+  font: 500 var(--text-11) / 1.6 var(--font-ui);
+  text-decoration: none;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+.shell-part:hover .shell-hint,
+.shell-part .shell-hint:focus-visible {
+  opacity: 1;
+}
+
+/* An editable piece: it looks like the page, never like a field. */
+.piece {
+  position: relative;
+  margin: 0 0 0.5em;
+}
+.piece.item {
+  padding-left: 0.35in;
+}
+.piece.item.sub {
+  padding-left: 0.7in;
+}
+.piece .n {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0.35in;
+}
+.piece.sub .n {
+  left: 0.35in;
+}
+.piece.dragging {
+  z-index: 5;
+  opacity: 0.85;
+}
+.piece.dragging .piece-text {
+  background: var(--color-blue-tint-3);
+}
+.piece .ProseMirror {
+  outline: none;
+  min-height: 1.35em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.piece .ProseMirror > :last-child {
+  margin-bottom: 0;
+}
+.piece .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--color-muted-2);
+  font-family: var(--font-ui);
+  font-size: 0.85em;
+  pointer-events: none;
+}
+
+/* The ⠿ beside an item (045): Libre Franklin 9 px in the search rule's grey, always there; a
+   paragraph's shows on hover (045 draws none on paragraphs). */
+.piece-handle {
+  position: absolute;
+  top: calc(2px / var(--page-scale, 1));
+  left: calc(-18px / var(--page-scale, 1));
+  padding: 0 calc(3px / var(--page-scale, 1));
+  border: 0;
+  border-radius: calc(var(--radius-4) / var(--page-scale, 1));
+  background: none;
+  color: var(--color-line-underline);
+  font-family: var(--font-display);
+  font-size: calc(var(--text-9) / var(--page-scale, 1));
+  line-height: normal;
+  cursor: grab;
+  touch-action: none;
+  transition: opacity var(--duration-fast);
+}
+.piece.prose .piece-handle {
+  opacity: 0;
+}
+.piece.sub .piece-handle {
+  left: calc(0.35in - 18px / var(--page-scale, 1));
+}
+.piece-handle:hover {
+  background: var(--color-page);
+  color: var(--color-ink);
+}
+.piece-handle:active {
+  cursor: grabbing;
+}
+.piece:hover .piece-handle,
+.piece-handle:focus-visible,
+.piece.dragging .piece-handle {
+  opacity: 1;
+}
+
+.piece-menu {
+  position: absolute;
+  top: -2px;
+  right: -0.5in;
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+.piece:hover .piece-menu,
+.piece-menu:focus-within,
+.piece-menu:has([aria-expanded='true']) {
+  opacity: 1;
+}
+
+/* The rail's marks on the page (045): the amber tint under a piece with a suggestion, the
+   danger tint under a likely fight, 4 px round, 4px 6px around the words; a stronger edge on the
+   piece whose card is open. Clicking a mark opens its card, so the whole piece is a target. */
+.piece.hl-suggest .piece-text,
+.piece.hl-fight .piece-text {
+  border-radius: calc(var(--radius-4) / var(--page-scale, 1));
+  margin: 0 calc(-6px / var(--page-scale, 1));
+  padding: calc(4px / var(--page-scale, 1)) calc(6px / var(--page-scale, 1));
+  cursor: pointer;
+}
+.piece.hl-suggest .piece-text {
+  background: var(--color-amber-tint);
+}
+.piece.hl-fight .piece-text {
+  background: var(--color-danger-tint);
+}
+.piece.hl-selected .piece-text {
+  box-shadow: 0 0 0 1.5px var(--color-amber);
+}
+.piece.hl-fight.hl-selected .piece-text {
+  box-shadow: 0 0 0 1.5px var(--color-red-line);
+}
+.piece.hl-suggest .ProseMirror-focused,
+.piece.hl-fight .ProseMirror-focused {
+  cursor: text;
+}
+
+/* The ＋ between pieces. */
+.adder {
+  position: relative;
+  height: 12px;
+  margin: -6px 0;
+}
+.adder::before {
+  content: '';
+  position: absolute;
+  top: 5px;
+  right: 0;
+  left: 0;
+  border-top: 1px dashed var(--color-blue-fill-strong);
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+.adder .adder-menu {
+  position: absolute;
+  top: -7px;
+  left: -0.62in;
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+.adder:hover::before,
+.adder.always::before {
+  opacity: 1;
+}
+.adder:hover .adder-menu,
+.adder.always .adder-menu,
+.adder .adder-menu:focus-within,
+.adder .adder-menu:has([aria-expanded='true']) {
+  opacity: 1;
+}
+.adder.always {
+  height: 2em;
+  margin: 0;
+}
+.adder.always .adder-menu {
+  top: 0.3em;
+}
+
+/* Footnotes under a rule, the citation's marker as a superscript. */
+.letter-page .footnotes {
+  margin: 1.2em 0 0;
+  padding: 0.4em 0 0;
+  border-top: 1px solid currentColor;
+  list-style: none;
+  font-size: calc(var(--letter-size) - 2pt);
+}
+.letter-page .footnote {
+  position: relative;
+  margin: 0 0 0.2em;
+}
+.letter-page .footnote .m {
+  display: inline-block;
+  min-width: 1.2em;
+  vertical-align: super;
+  font-size: 80%;
+}
+.footnote .footnote-tools {
+  position: absolute;
+  top: 0;
+  right: -0.5in;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+.footnote:hover .footnote-tools,
+.footnote .footnote-tools:focus-within {
+  opacity: 1;
+}
+
+.letter-page .signer {
+  margin-top: 2.5em;
+}
+
+.letter-page .locked-block {
+  position: relative;
+  margin: 0 0 0.5em;
+  padding: 0.2em 0.4em;
+  border-radius: calc(var(--radius-4) / var(--page-scale, 1));
+  background: var(--color-surface-row);
+}
+.letter-page .locked-block .shell-hint {
+  opacity: 1;
+  top: 0;
+}
+
+/* The toolbar (no screen draws it; P20g): the stage's segmented look, a white raised strip of
+   26 px keys, 10 px round, floating over the top of the page while a part is being edited. */
+.letter-toolbar {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  align-items: center;
+  max-width: 100%;
+  padding: 3px;
+  border-radius: var(--radius-10);
+  background: var(--color-card-white);
+  box-shadow: var(--shadow-field);
+  font-family: var(--font-ui);
+  line-height: normal;
+}
+.tb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 26px;
+  min-width: 26px;
+  padding: 0 7px;
+  border: 0;
+  border-radius: var(--radius-8);
+  background: none;
+  color: var(--color-ink-2);
+  font: 600 var(--text-12) / 1 var(--font-ui);
+  cursor: pointer;
+}
+.tb:hover {
+  background: var(--color-page);
+  color: var(--color-ink);
+}
+.tb[aria-pressed='true'] {
+  background: var(--color-brand-tint);
+  color: var(--color-brand);
+}
+.tb:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.tb:disabled:hover {
+  background: none;
+}
+.tb-sep {
+  width: 1px;
+  height: 16px;
+  margin: 0 3px;
+  background: var(--color-line);
+}
+
+/* A small menu under a button (the menus of 022: 10 px round, flush rows). */
+.menu {
+  position: relative;
+  display: inline-block;
+}
+.pop {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 20;
+  min-width: 11rem;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-10);
+  background: var(--color-card-white);
+  box-shadow: var(--shadow-menu);
+  color: var(--color-ink);
+  font: 400 var(--text-125) / normal var(--font-ui);
+}
+.pop.pop-right {
+  right: 0;
+  left: auto;
+}
+.pop button {
+  display: block;
+  width: 100%;
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.pop button:hover {
+  background: var(--color-hover);
+}
+.pop button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.pop button:disabled:hover {
+  background: none;
+}
+
+/* A frozen letter shows no way to change it. */
+.letter-page.frozen .piece-handle,
+.letter-page.frozen .piece-menu,
+.letter-page.frozen .adder,
+.letter-page.frozen .footnote-tools {
+  display: none;
+}
+
+/* A document edited on its own (TextEditor): the page's type inside a field-shaped box. */
+.text-editor {
+  --letter-font: 'Times New Roman';
+  --letter-size: 12pt;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-9);
+  background: var(--color-card-white);
+  color: var(--color-letter-ink);
+  font-family: var(--letter-font), var(--font-letter);
+  font-size: var(--letter-size);
+  line-height: 1.35;
+}
+.text-editor:focus-within {
+  border-color: var(--color-brand);
+}
+.text-editor .ProseMirror {
+  outline: none;
+  min-height: 4.5em;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.text-editor .ProseMirror > :last-child {
+  margin-bottom: 0;
+}
+.text-editor .ProseMirror p {
+  margin: 0 0 0.6em;
+}
+.text-editor .ProseMirror ul,
+.text-editor .ProseMirror ol {
+  margin: 0 0 0.6em;
+  padding-left: 1.6em;
+}
+.text-editor .ProseMirror table {
+  border-collapse: collapse;
+  margin: 0.6em 0;
+}
+.text-editor .ProseMirror td,
+.text-editor .ProseMirror th {
+  border: 1px solid currentColor;
+  padding: 0.2em 0.4em;
+  min-width: 2em;
+  vertical-align: top;
+}
+.text-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  color: var(--color-muted-2);
+  font-family: var(--font-ui);
+  font-size: 0.85em;
+  pointer-events: none;
+}
+.text-editor .ProseMirror .selectedCell {
+  background: var(--color-brand-tint);
+}
+
+/* The toolbar above a TextEditor takes the editor's width and sits in the flow. */
+.letter-toolbar.fluid {
+  display: flex;
+  margin: 0 0 8px;
+}
+
+/* The template editor's Parts list (design 1z). */
+.part {
+  position: relative;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0.55rem 0.5rem 0.55rem 0.25rem;
+  border-bottom: 1px solid var(--color-line-2);
+  cursor: pointer;
+}
+.part[aria-selected='true'] {
+  background: var(--color-blue-tint-3);
+}
+.part.dragging {
+  z-index: 5;
+  background: var(--color-card-white);
+  box-shadow: var(--shadow-menu);
+}
+.part .part-handle {
+  flex: none;
+  padding: 1px 3px;
+  border: 0;
+  border-radius: var(--radius-4);
+  background: none;
+  color: var(--color-ink-3);
+  font-size: var(--text-md-lg);
+  line-height: 1.2;
+  cursor: grab;
+  touch-action: none;
+}
+.part .part-handle:hover {
+  background: var(--color-page);
+  color: var(--color-ink);
+}
+.part .part-handle:active {
+  cursor: grabbing;
+}
+.part .part-n {
+  flex: none;
+  min-width: 1.4rem;
+  font-weight: 600;
+  color: var(--color-ink-2);
+}
+.part .part-menu {
+  flex: none;
+  opacity: 0;
+  transition: opacity var(--duration-fast);
+}
+.part:hover .part-menu,
+.part:focus-within .part-menu,
+.part .part-menu:has([aria-expanded='true']) {
+  opacity: 1;
+}

@@ -1,0 +1,133 @@
+# P25a: the development sign-in stack (DECISIONS 51, 52). Keycloak with its own Postgres, a mail
+# catcher for the mail Keycloak sends (invitations, resets), and keycloak-config-cli, which applies
+# the realm in keycloak/realm/ on every start and exits. Run it with `just keycloak-up`; the
+# recipe makes the development secrets first (var/keycloak/dev.env) and passes them as --env-file.
+#
+# Laid out as production is (notes): Keycloak serves under /auth on the portal's own
+# address. In development that address is Vite's, http://localhost:5173, which proxies /auth to
+# port 8080 here; the portal's server reaches Keycloak directly on 8080 (back channel), and the
+# admin console is http://localhost:8080/auth/admin/ only.
+name: sclu-keycloak
+
+services:
+  keycloak-db:
+    # Production is a database and role of its own on the server's Postgres (notes).
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_DB: keycloak
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: ${KEYCLOAK_DB_PASSWORD:?run `just keycloak-up`, which makes var/keycloak/dev.env}
+    volumes:
+      - keycloak-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  mailpit:
+    # Every message Keycloak sends lands here: http://localhost:8026 (the drafting fork's own
+    # Mailpit holds 8025 and 1026).
+    image: axllent/mailpit:v1.31.3
+    ports:
+      - "127.0.0.1:8026:8025"
+      - "127.0.0.1:1027:1025"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.1
+    command: ["start"]
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://keycloak-db:5432/keycloak # gitleaks:allow (no secret; the password is KC_DB_PASSWORD)
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: ${KEYCLOAK_DB_PASSWORD}
+      # Production mode (`start`), with plain HTTP because the proxy in front (Vite here, nginx on
+      # the server) is where TLS ends.
+      KC_HTTP_ENABLED: "true"
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_HOSTNAME: ${KC_HOSTNAME:-http://localhost:5173/auth}
+      KC_HOSTNAME_ADMIN: ${KC_HOSTNAME_ADMIN:-http://localhost:8080/auth}
+      KC_HOSTNAME_STRICT: "true"
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_PROXY_HEADERS: xforwarded
+      KC_HEALTH_ENABLED: "true"
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KC_BOOTSTRAP_ADMIN_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KC_BOOTSTRAP_ADMIN_PASSWORD}
+      KC_BOOTSTRAP_ADMIN_CLIENT_ID: ${KC_BOOTSTRAP_ADMIN_CLIENT_ID}
+      KC_BOOTSTRAP_ADMIN_CLIENT_SECRET: ${KC_BOOTSTRAP_ADMIN_CLIENT_SECRET}
+    ports:
+      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:9180:9000"
+    volumes:
+      # The sign-in pages (keycloak/theme, Keycloakify), built by `just keycloak-theme`.
+      - ../var/keycloak/providers:/opt/keycloak/providers:ro
+      # Django's list of common passwords (BSD-licensed), the portal's old CommonPasswordValidator,
+      # read by the realm's password policy `passwordBlacklist(common-passwords.txt)`.
+      - ./password-blacklists:/opt/keycloak/data/password-blacklists:ro
+    extra_hosts:
+      # Back-channel logout reaches the portal's dev server on the host.
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      keycloak-db:
+        condition: service_healthy
+    healthcheck:
+      # The image has no curl; bash's /dev/tcp asks the management port's readiness check.
+      test:
+        - CMD-SHELL
+        - >-
+          exec 3<>/dev/tcp/127.0.0.1/9000 &&
+          printf 'GET /auth/health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 &&
+          grep -q '"status": "UP"' <&3
+      interval: 5s
+      timeout: 5s
+      retries: 60
+      start_period: 20s
+
+  keycloak-config:
+    # The realm as configuration (keycloak/realm/*.json), applied on every start and safe to
+    # apply again: keycloak-config-cli compares the file with the realm and changes only what
+    # differs (DECISIONS 52b).
+    image: adorsys/keycloak-config-cli:6.5.1-26.5.5
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    restart: "no"
+    environment:
+      KEYCLOAK_URL: http://keycloak:8080/auth
+      KEYCLOAK_GRANTTYPE: client_credentials
+      KEYCLOAK_CLIENTID: ${KC_BOOTSTRAP_ADMIN_CLIENT_ID}
+      KEYCLOAK_CLIENTSECRET: ${KC_BOOTSTRAP_ADMIN_CLIENT_SECRET}
+      KEYCLOAK_AVAILABILITYCHECK_ENABLED: "true"
+      KEYCLOAK_AVAILABILITYCHECK_TIMEOUT: 120s
+      IMPORT_FILES_LOCATIONS: /config/*.json
+      IMPORT_VARSUBSTITUTION_ENABLED: "true"
+      # Compare the realm with the file on every apply. With its checksum cache on (the default),
+      # an unchanged file is skipped, so a change made by hand in the admin console survived
+      # `just keycloak-config`. Flows and executions keep their ids either way.
+      IMPORT_CACHE_ENABLED: "false"
+      # The values the realm file reads ($(env:NAME)); production sets its own (notes).
+      SCLU_PORTAL_URL: ${SCLU_PORTAL_URL:-http://localhost:5173}
+      SCLU_PORTAL_BACKCHANNEL_URL: ${SCLU_PORTAL_BACKCHANNEL_URL:-http://host.docker.internal:8000}
+      # P25b: the drafting tool (apps/mike). Its pages as a browser reaches them, its sign-in
+      # service's public address (GoTrue's API_EXTERNAL_URL, the fork's SUPABASE_PUBLIC_URL; the
+      # callback is <that>/auth/v1/callback), and its backend as Keycloak reaches it for the
+      # back-channel logout (the fork's Compose publishes 3001 on the host's loopback).
+      SCLU_DRAFTING_URL: ${SCLU_DRAFTING_URL:-http://localhost:3000}
+      SCLU_DRAFTING_AUTH_URL: ${SCLU_DRAFTING_AUTH_URL:-http://localhost:54321}
+      SCLU_DRAFTING_BACKCHANNEL_URL: ${SCLU_DRAFTING_BACKCHANNEL_URL:-http://host.docker.internal:3001}
+      SCLU_SSL_REQUIRED: ${SCLU_SSL_REQUIRED:-external}
+      SCLU_SMTP_HOST: ${SCLU_SMTP_HOST:-mailpit}
+      SCLU_SMTP_PORT: ${SCLU_SMTP_PORT:-1025}
+      SCLU_SMTP_FROM: ${SCLU_SMTP_FROM:-portal@requests.thesclu.org}
+      SCLU_SMTP_STARTTLS: ${SCLU_SMTP_STARTTLS:-false}
+      SCLU_SMTP_AUTH: ${SCLU_SMTP_AUTH:-false}
+      SCLU_SMTP_USER: ${SCLU_SMTP_USER:-}
+      SCLU_SMTP_PASSWORD: ${SCLU_SMTP_PASSWORD:-}
+      KEYCLOAK_PORTAL_CLIENT_SECRET: ${KEYCLOAK_PORTAL_CLIENT_SECRET}
+      KEYCLOAK_ADMIN_CLIENT_SECRET: ${KEYCLOAK_ADMIN_CLIENT_SECRET}
+      KEYCLOAK_DRAFTING_CLIENT_SECRET: ${KEYCLOAK_DRAFTING_CLIENT_SECRET:?run `just keycloak-up`, which adds it to var/keycloak/dev.env}
+    volumes:
+      - ./realm:/config:ro
+
+volumes:
+  keycloak-db:

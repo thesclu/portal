@@ -1,0 +1,393 @@
+# calendars.toml -- jurisdiction calendars (weekend + dated holiday list) and the law -> calendar
+# mapping.
+#
+# HOLIDAY SET AND AUTHORITY (see notes, "Holiday calendar -- Q1-Q5", 2026-09-08).
+#
+# The list below is the UNION of two independently operating chains, because a CPRA-style response
+# deadline is reached by both and neither displaces the other:
+#
+#   Code Civ. Proc. § 12a  -- the operative extension statute. § 12a(a): the period "is hereby
+#     extended to and including the next day that is not a holiday"; § 12a(b) reaches acts required
+#     "whether expressed in this or any other code." Its "holiday" is defined as Saturdays + the
+#     judicial holidays in Code Civ. Proc. § 135 + Code Civ. Proc. § 12b office closures -- it does
+#     NOT reference Gov. Code § 6700. Parsons v. Estenson Logistics, LLC (2022) 86 Cal.App.5th 1260
+#     applies § 12a to a substantive performance duty in another code and holds that an express
+#     "calendar days" does not oust it. Ursino v. Superior Court (1974) 39 Cal.App.3d 611, 615 fn. 3
+#     applies it to a public body's own duty to act, over a Saturday; endorsed in DeLeon v. Bay Area
+#     Rapid Transit Dist. (1983) 33 Cal.3d 456.
+#   Gov. Code § 6800     -- supplies the count (exclude the first day, include the last) and, via
+#     Gov. Code § 6700, reaches three days that § 135 expressly excludes. Direction is forward:
+#     Alford v. Industrial Acci. Com. (1946) 28 Cal.2d 198, 200. § 6800 CANNOT deliver Saturday --
+#     Saturday is not a § 6700 holiday (People v. Pickens (1981) 124 Cal.App.3d 800).
+#
+# Encoding the union keeps ONE calendar correct for every law here. Gov. Code § 6700(a)(20)(B) makes
+# MLK Day, Lunar New Year and Farmworkers Day inapplicable to "a city, county, or district" absent a
+# local ordinance, which would otherwise force separate state and local calendars; § 135 carries no
+# such carve-out, so those days are holidays for every agency on the § 12a chain.
+#
+# NO California case decides any of this for the CPRA. The chain is statutory text plus close
+# analogues; an agency has a non-frivolous contrary argument (Harris v. Alcoholic Beverage Control
+# Appeals Bd. (1963) 223 Cal.App.2d 563). See notes Q1(f).
+#
+# DELIBERATELY NOT ENCODED, each for a reason -- do not "complete" this list without reading Q2:
+#   Lunar New Year (§ 6700(a)(4)) and Diwali (§ 6700(a)(9)) -- excluded from § 135, and no
+#     authoritative multi-year dated series exists (CalHR publishes the statutory formula, not
+#     dates). Computing a lunar date here would be inventing it. The engine under-rolls on these
+#     two days for state agencies.
+#   Good Friday (§ 6700(a)(19)) -- a holiday only "from 12 noon until 3 p.m."; § 135 takes only
+#     "every full day" designated by § 6700, and is_business_day is all-or-nothing.
+#   Governor/President proclaimed days (§ 6700(a)(20)(A)) -- not knowable in advance, and most are
+#     § 6705 "special or limited" holidays on which public offices stay open. Thanksgiving IS
+#     encoded: § 6700(a)(20)(B) carves it back in for everyone, 5 U.S.C. § 6103(a) fixes the date.
+#   Code Civ. Proc. § 12b whole-day office closures -- real (campus winter closures, furlough days)
+#     but per-agency and not computable; belongs in a future per-agency closure table.
+#
+# Gov. Code § 6701 ADDS days rather than moving them ("the Monday following IS a holiday"), and its
+# subdivision (a) list is a CLOSED enumeration of seven dates never updated for Juneteenth or
+# Genocide Remembrance Day -- a Sunday June 19 generates no Monday holiday. There is no general
+# Saturday rule: a Saturday July 4 produces no Friday holiday (this bites in 2026).
+#
+# RANGE: 2012-01-01 .. 2030-12-31. 2012 is the earliest effective_from in rules.toml. Weekend dates
+# are omitted -- weekend = [5, 6] already excludes them. Phase-ins are honoured, not backfilled:
+# Native American Day from 2015, Juneteenth and Genocide Remembrance Day from 2023.
+# *** THIS LIST EXPIRES. Extend it before 2030 or every date after it silently stops rolling. ***
+
+[calendar.california]
+timezone = "America/Los_Angeles"
+holidays = [
+
+  # ---- 2012 (13) ----
+  2012-01-02,  # Gov 6701(a): Monday after Sunday 2012-01-01
+  2012-01-16,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2012-02-13,  # Gov 6701(a): Monday after Sunday 2012-02-12
+  2012-02-20,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2012-05-28,  # Memorial Day, Gov 6700(a)(10)
+  2012-07-04,  # July 4, Gov 6700(a)(12)
+  2012-09-03,  # Labor Day, Gov 6700(a)(13)
+  2012-09-10,  # Gov 6701(a): Monday after Sunday 2012-09-09
+  2012-10-08,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2012-11-12,  # Gov 6701(a): Monday after Sunday 2012-11-11
+  2012-11-22,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2012-11-23,  # Day after Thanksgiving, CCP 135 only
+  2012-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2013 (14) ----
+  2013-01-01,  # Jan 1, Gov 6700(a)(2)
+  2013-01-21,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2013-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2013-02-18,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2013-04-01,  # Gov 6701(a): Monday after Sunday 2013-03-31
+  2013-05-27,  # Memorial Day, Gov 6700(a)(10)
+  2013-07-04,  # July 4, Gov 6700(a)(12)
+  2013-09-02,  # Labor Day, Gov 6700(a)(13)
+  2013-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2013-10-14,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2013-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2013-11-28,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2013-11-29,  # Day after Thanksgiving, CCP 135 only
+  2013-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2014 (14) ----
+  2014-01-01,  # Jan 1, Gov 6700(a)(2)
+  2014-01-20,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2014-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2014-02-17,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2014-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2014-05-26,  # Memorial Day, Gov 6700(a)(10)
+  2014-07-04,  # July 4, Gov 6700(a)(12)
+  2014-09-01,  # Labor Day, Gov 6700(a)(13)
+  2014-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2014-10-13,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2014-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2014-11-27,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2014-11-28,  # Day after Thanksgiving, CCP 135 only
+  2014-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2015 (14) ----
+  2015-01-01,  # Jan 1, Gov 6700(a)(2)
+  2015-01-19,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2015-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2015-02-16,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2015-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2015-05-25,  # Memorial Day, Gov 6700(a)(10)
+  2015-09-07,  # Labor Day, Gov 6700(a)(13)
+  2015-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2015-09-25,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2015-10-12,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2015-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2015-11-26,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2015-11-27,  # Day after Thanksgiving, CCP 135 only
+  2015-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2016 (15) ----
+  2016-01-01,  # Jan 1, Gov 6700(a)(2)
+  2016-01-18,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2016-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2016-02-15,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2016-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2016-05-30,  # Memorial Day, Gov 6700(a)(10)
+  2016-07-04,  # July 4, Gov 6700(a)(12)
+  2016-09-05,  # Labor Day, Gov 6700(a)(13)
+  2016-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2016-09-23,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2016-10-10,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2016-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2016-11-24,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2016-11-25,  # Day after Thanksgiving, CCP 135 only
+  2016-12-26,  # Gov 6701(a): Monday after Sunday 2016-12-25
+
+  # ---- 2017 (14) ----
+  2017-01-02,  # Gov 6701(a): Monday after Sunday 2017-01-01
+  2017-01-16,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2017-02-13,  # Gov 6701(a): Monday after Sunday 2017-02-12
+  2017-02-20,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2017-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2017-05-29,  # Memorial Day, Gov 6700(a)(10)
+  2017-07-04,  # July 4, Gov 6700(a)(12)
+  2017-09-04,  # Labor Day, Gov 6700(a)(13)
+  2017-09-22,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2017-10-09,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2017-11-10,  # Gov 6701(b): Friday before Saturday Veterans Day
+  2017-11-23,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2017-11-24,  # Day after Thanksgiving, CCP 135 only
+  2017-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2018 (14) ----
+  2018-01-01,  # Jan 1, Gov 6700(a)(2)
+  2018-01-15,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2018-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2018-02-19,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2018-05-28,  # Memorial Day, Gov 6700(a)(10)
+  2018-07-04,  # July 4, Gov 6700(a)(12)
+  2018-09-03,  # Labor Day, Gov 6700(a)(13)
+  2018-09-10,  # Gov 6701(a): Monday after Sunday 2018-09-09
+  2018-09-28,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2018-10-08,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2018-11-12,  # Gov 6701(a): Monday after Sunday 2018-11-11
+  2018-11-22,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2018-11-23,  # Day after Thanksgiving, CCP 135 only
+  2018-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2019 (15) ----
+  2019-01-01,  # Jan 1, Gov 6700(a)(2)
+  2019-01-21,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2019-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2019-02-18,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2019-04-01,  # Gov 6701(a): Monday after Sunday 2019-03-31
+  2019-05-27,  # Memorial Day, Gov 6700(a)(10)
+  2019-07-04,  # July 4, Gov 6700(a)(12)
+  2019-09-02,  # Labor Day, Gov 6700(a)(13)
+  2019-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2019-09-27,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2019-10-14,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2019-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2019-11-28,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2019-11-29,  # Day after Thanksgiving, CCP 135 only
+  2019-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2020 (14) ----
+  2020-01-01,  # Jan 1, Gov 6700(a)(2)
+  2020-01-20,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2020-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2020-02-17,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2020-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2020-05-25,  # Memorial Day, Gov 6700(a)(10)
+  2020-09-07,  # Labor Day, Gov 6700(a)(13)
+  2020-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2020-09-25,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2020-10-12,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2020-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2020-11-26,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2020-11-27,  # Day after Thanksgiving, CCP 135 only
+  2020-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2021 (14) ----
+  2021-01-01,  # Jan 1, Gov 6700(a)(2)
+  2021-01-18,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2021-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2021-02-15,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2021-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2021-05-31,  # Memorial Day, Gov 6700(a)(10)
+  2021-07-05,  # Gov 6701(a): Monday after Sunday 2021-07-04
+  2021-09-06,  # Labor Day, Gov 6700(a)(13)
+  2021-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2021-09-24,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2021-10-11,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2021-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2021-11-25,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2021-11-26,  # Day after Thanksgiving, CCP 135 only
+
+  # ---- 2022 (13) ----
+  2022-01-17,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2022-02-21,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2022-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2022-05-30,  # Memorial Day, Gov 6700(a)(10)
+  2022-07-04,  # July 4, Gov 6700(a)(12)
+  2022-09-05,  # Labor Day, Gov 6700(a)(13)
+  2022-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2022-09-23,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2022-10-10,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2022-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2022-11-24,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2022-11-25,  # Day after Thanksgiving, CCP 135 only
+  2022-12-26,  # Gov 6701(a): Monday after Sunday 2022-12-25
+
+  # ---- 2023 (16) ----
+  2023-01-02,  # Gov 6701(a): Monday after Sunday 2023-01-01
+  2023-01-16,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2023-02-13,  # Gov 6701(a): Monday after Sunday 2023-02-12
+  2023-02-20,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2023-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2023-04-24,  # Genocide Remembrance Day, Gov 6700(a)(8), AB 1801 Ch.761/2022, oper. 2023-01-01 [Gov 6800 chain only]
+  2023-05-29,  # Memorial Day, Gov 6700(a)(10)
+  2023-06-19,  # Juneteenth, Gov 6700(a)(11), AB 1655 Ch.753/2022, oper. 2023-01-01
+  2023-07-04,  # July 4, Gov 6700(a)(12)
+  2023-09-04,  # Labor Day, Gov 6700(a)(13)
+  2023-09-22,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2023-10-09,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2023-11-10,  # Gov 6701(b): Friday before Saturday Veterans Day
+  2023-11-23,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2023-11-24,  # Day after Thanksgiving, CCP 135 only
+  2023-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2024 (17) ----
+  2024-01-01,  # Jan 1, Gov 6700(a)(2)
+  2024-01-15,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2024-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2024-02-19,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2024-04-01,  # Gov 6701(a): Monday after Sunday 2024-03-31
+  2024-04-24,  # Genocide Remembrance Day, Gov 6700(a)(8), AB 1801 Ch.761/2022, oper. 2023-01-01 [Gov 6800 chain only]
+  2024-05-27,  # Memorial Day, Gov 6700(a)(10)
+  2024-06-19,  # Juneteenth, Gov 6700(a)(11), AB 1655 Ch.753/2022, oper. 2023-01-01
+  2024-07-04,  # July 4, Gov 6700(a)(12)
+  2024-09-02,  # Labor Day, Gov 6700(a)(13)
+  2024-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2024-09-27,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2024-10-14,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2024-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2024-11-28,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2024-11-29,  # Day after Thanksgiving, CCP 135 only
+  2024-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2025 (17) ----
+  2025-01-01,  # Jan 1, Gov 6700(a)(2)
+  2025-01-20,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2025-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2025-02-17,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2025-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2025-04-24,  # Genocide Remembrance Day, Gov 6700(a)(8), AB 1801 Ch.761/2022, oper. 2023-01-01 [Gov 6800 chain only]
+  2025-05-26,  # Memorial Day, Gov 6700(a)(10)
+  2025-06-19,  # Juneteenth, Gov 6700(a)(11), AB 1655 Ch.753/2022, oper. 2023-01-01
+  2025-07-04,  # July 4, Gov 6700(a)(12)
+  2025-09-01,  # Labor Day, Gov 6700(a)(13)
+  2025-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2025-09-26,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2025-10-13,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2025-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2025-11-27,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2025-11-28,  # Day after Thanksgiving, CCP 135 only
+  2025-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2026 (16) ----
+  2026-01-01,  # Jan 1, Gov 6700(a)(2)
+  2026-01-19,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2026-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2026-02-16,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2026-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2026-04-24,  # Genocide Remembrance Day, Gov 6700(a)(8), AB 1801 Ch.761/2022, oper. 2023-01-01 [Gov 6800 chain only]
+  2026-05-25,  # Memorial Day, Gov 6700(a)(10)
+  2026-06-19,  # Juneteenth, Gov 6700(a)(11), AB 1655 Ch.753/2022, oper. 2023-01-01
+  2026-09-07,  # Labor Day, Gov 6700(a)(13)
+  2026-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2026-09-25,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2026-10-12,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2026-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2026-11-26,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2026-11-27,  # Day after Thanksgiving, CCP 135 only
+  2026-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2027 (14) ----
+  2027-01-01,  # Jan 1, Gov 6700(a)(2)
+  2027-01-18,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2027-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2027-02-15,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2027-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2027-05-31,  # Memorial Day, Gov 6700(a)(10)
+  2027-07-05,  # Gov 6701(a): Monday after Sunday 2027-07-04
+  2027-09-06,  # Labor Day, Gov 6700(a)(13)
+  2027-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2027-09-24,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2027-10-11,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2027-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2027-11-25,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2027-11-26,  # Day after Thanksgiving, CCP 135 only
+
+  # ---- 2028 (14) ----
+  2028-01-17,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2028-02-21,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2028-03-31,  # Farmworkers Day, Gov 6700(a)(7) / CCP 135
+  2028-04-24,  # Genocide Remembrance Day, Gov 6700(a)(8), AB 1801 Ch.761/2022, oper. 2023-01-01 [Gov 6800 chain only]
+  2028-05-29,  # Memorial Day, Gov 6700(a)(10)
+  2028-06-19,  # Juneteenth, Gov 6700(a)(11), AB 1655 Ch.753/2022, oper. 2023-01-01
+  2028-07-04,  # July 4, Gov 6700(a)(12)
+  2028-09-04,  # Labor Day, Gov 6700(a)(13)
+  2028-09-22,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2028-10-09,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2028-11-10,  # Gov 6701(b): Friday before Saturday Veterans Day
+  2028-11-23,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2028-11-24,  # Day after Thanksgiving, CCP 135 only
+  2028-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2029 (16) ----
+  2029-01-01,  # Jan 1, Gov 6700(a)(2)
+  2029-01-15,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2029-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2029-02-19,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2029-04-24,  # Genocide Remembrance Day, Gov 6700(a)(8), AB 1801 Ch.761/2022, oper. 2023-01-01 [Gov 6800 chain only]
+  2029-05-28,  # Memorial Day, Gov 6700(a)(10)
+  2029-06-19,  # Juneteenth, Gov 6700(a)(11), AB 1655 Ch.753/2022, oper. 2023-01-01
+  2029-07-04,  # July 4, Gov 6700(a)(12)
+  2029-09-03,  # Labor Day, Gov 6700(a)(13)
+  2029-09-10,  # Gov 6701(a): Monday after Sunday 2029-09-09
+  2029-09-28,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2029-10-08,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2029-11-12,  # Gov 6701(a): Monday after Sunday 2029-11-11
+  2029-11-22,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2029-11-23,  # Day after Thanksgiving, CCP 135 only
+  2029-12-25,  # Dec 25, Gov 6700(a)(18)
+
+  # ---- 2030 (17) ----
+  2030-01-01,  # Jan 1, Gov 6700(a)(2)
+  2030-01-21,  # MLK Day, Gov 6700(a)(3) / CCP 135
+  2030-02-12,  # Lincoln Day, Gov 6700(a)(5)
+  2030-02-18,  # 3rd Mon Feb, Gov 6700(a)(6)
+  2030-04-01,  # Gov 6701(a): Monday after Sunday 2030-03-31
+  2030-04-24,  # Genocide Remembrance Day, Gov 6700(a)(8), AB 1801 Ch.761/2022, oper. 2023-01-01 [Gov 6800 chain only]
+  2030-05-27,  # Memorial Day, Gov 6700(a)(10)
+  2030-06-19,  # Juneteenth, Gov 6700(a)(11), AB 1655 Ch.753/2022, oper. 2023-01-01
+  2030-07-04,  # July 4, Gov 6700(a)(12)
+  2030-09-02,  # Labor Day, Gov 6700(a)(13)
+  2030-09-09,  # Admission Day, Gov 6700(a)(14) [Gov 6800 chain only]
+  2030-09-27,  # Native American Day, Gov 6700(a)(15), AB 1973, oper. 2015-01-01
+  2030-10-14,  # Columbus Day, Gov 6700(a)(16) [Gov 6800 chain only]
+  2030-11-11,  # Veterans Day, Gov 6700(a)(17)
+  2030-11-28,  # Thanksgiving, Gov 6700(a)(20)(B) + 5 USC 6103(a) + CCP 135
+  2030-11-29,  # Day after Thanksgiving, CCP 135 only
+  2030-12-25,  # Dec 25, Gov 6700(a)(18)
+]
+
+[law.CPRA]
+calendar = "california"
+
+# Educ. Code campus foundations and auxiliary organizations. Separate law values because their
+# statutes differ from the CPRA (written request required, four unusual-circumstance grounds, and
+# § 92953(d) inverts the names-and-titles duty), but the same California holiday calendar: their
+# express "10 calendar days" does not oust the roll-forward (Parsons, supra, at p. 1276).
+[law.UC_FOUNDATION]
+calendar = "california"
+
+[law.CSU_AUXILIARY]
+calendar = "california"
+
+[law.CCD_AUXILIARY]
+calendar = "california"

@@ -1,0 +1,366 @@
+# rules.toml -- the only place a statutory day count may live.
+#
+# STATUS: live rules entered 2026-09-08 (was: ships empty). Every count below is copied from the
+# statute text named in its citation, and every citation was checked against the section text
+# rather than a secondary source. Read the statute before relying on a computed date; this file
+# is a transcription, not an authority.
+#
+# Schema, one [[rule]] table per effective-dated clock:
+#
+#   id                                  -- stable string, becomes deadlines.rule_ref, by
+#                                          convention "<law>.<deadline_type>.<provision or
+#                                          'general'>.<effective_from date>"
+#   law                                 -- matches agencies.records_law, e.g. the law code
+#   provision                           -- "" for the general rule; else a named carve-out
+#                                          matching a request item's provisions tuple
+#   deadline_type                       -- "statutory_determination" or "production"
+#   days                                -- the count, taken verbatim from the statute text
+#   unit                                -- "calendar_days" or "business_days"
+#   count_from                          -- optional, defaults to "clock_start" (the only value
+#                                          currently supported)
+#   roll_forward_on_non_business_day    -- optional, defaults to true
+#   effective_from                      -- an ISO date (TOML date literal); inclusive
+#   effective_to                        -- optional ISO date; exclusive; omit if still in force
+#   citation                            -- required, non-empty; name the statute section
+#
+# Counting convention (enforced by packages/deadline_rules/src/deadline_rules/calendar.py and
+# pinned by its tests): due = clock_start + days if unit is calendar-based, or the N-th business
+# day strictly after clock_start if unit is business-based; then, only if
+# roll_forward_on_non_business_day is true, roll the result forward to the next business day if
+# it lands on a weekend or a listed holiday. clock_start itself is never counted.
+#
+# Two rules may share (law, provision, deadline_type) only if their effective ranges do not
+# overlap -- select_rule() raises AmbiguousRuleError if a lookup date matches more than one.
+#
+# ---------------------------------------------------------------------------------------------
+# WHY THE COUNTING CONVENTION IS THE RIGHT ONE FOR CALIFORNIA
+#
+# "clock_start itself is never counted" is Gov. Code section 6800: time "is computed by excluding
+# the first day, and including the last, unless the last day is a holiday, and then it is also
+# excluded." Code Civ. Proc. section 12 is word-for-word identical.
+#
+# roll_forward is Code Civ. Proc. section 12a. This matters and is not redundant: Gov. Code
+# section 6700 makes every SUNDAY a holiday but does NOT list Saturday, and section 6800 says
+# only that a holiday last day is "excluded" -- not where the deadline then lands. Section 12a(a)
+# supplies both the Saturday rule ("'holiday' means all day on Saturdays") and the roll-forward
+# ("extended to and including the next day that is not a holiday"), and section 12a(b) is what
+# reaches a non-judicial deadline in another code. Section 12b treats an all-day office closure
+# as a holiday.
+#
+# CALENDAR GAP -- READ THIS. calendars.toml currently ships holidays = [], so every date this
+# package computes is weekend-correct and HOLIDAY-WRONG. Until that list is filled in, a due date
+# landing on a state holiday will be reported a day or more early. Two cautions when filling it:
+#   - Gov. Code section 6700 is the state list.
+#   - Gov. Code section 6700(a)(20)(B): MLK Day, Lunar New Year, and Farmworkers Day (and
+#     Governor/Presidential-appointed days, except Thanksgiving) do NOT apply to a city, county,
+#     or district unless adopted by charter, ordinance, or resolution. A state agency and a city
+#     therefore have different day-10s, which one "california" calendar cannot express. If that
+#     distinction starts to matter, it is a second calendar key plus a per-agency jurisdiction
+#     override, not a change to this file.
+#
+# ---------------------------------------------------------------------------------------------
+# WHY THERE IS NO GENERAL "production" RULE -- IT IS NOT A STATUTORY CLOCK
+#
+# This file supplies deadlines with basis = "statutory" ONLY. The general production deadline is
+# not one of them. It is the agency's own estimated date, opened per request, never derived from
+# a count.
+#
+# Gov. Code section 7922.535(a) requires the determination, where disclosable records exist, to
+# "state the estimated date and time when the records will be made available." THAT stated date
+# is the production deadline the portal tracks: open_deadline(basis="agency_commitment") on the
+# determination event, due_at = the date the agency gave, rule_ref null. It is a promise the
+# agency made, not a count the Legislature set, so it cannot live in this file -- there is no
+# per-request value a rule could carry.
+#
+# Nor is there a statutory fallback to put here instead. Gov. Code section 7922.530(a) requires
+# only that records be "promptly available," and Voice of San Diego v. San Diego Unified School
+# Dist. (2026) 120 Cal.App.5th 923 holds that standard has no fixed deadline and is decided case
+# by case. Motorola Communication & Electronics, Inc. v. Dept. of General Services (1997) 55
+# Cal.App.4th 1340, 1349 is to the same effect: the ten days is to determine and notify, "It does
+# not require production within 10 days," and the Act "does not specify when records must be
+# produced."
+#
+# compute_deadlines is built for exactly this: a missing general production rule yields no
+# request-level production row, not an error, leaving that row to be opened later from the
+# agency's own date. DO NOT put a number here. It would be invented -- the failure this package
+# exists to prevent -- and it would also pre-empt the agency-commitment row with a fake statutory
+# one, which is worse than having no row at all. The production_review_window_days setting in
+# backend/portal/core/defaults.toml is an internal review window, not a deadline of either kind;
+# do not promote it into this file.
+#
+# Tracking the agency's own date earns its keep: an agency that states a date and then does not
+# produce is compellable on that basis (Sukumar v. City of San Diego (2017) 14 Cal.App.5th 451),
+# and the stated date is the evidence.
+#
+# ---------------------------------------------------------------------------------------------
+# THE STATUTORY PRODUCTION CARVE-OUTS vs. THE AGENCY'S DATE
+#
+# The two production rules below ARE real statutory counts running from the request, so they do
+# belong here -- and a request can carry both kinds at once: the statutory ceiling from this file
+# and the agency's own estimate opened as basis="agency_commitment". They are not redundant and
+# neither should silently supersede the other. The "flagged when it conflicts" case in the
+# BUILD_PLAN walkthrough is precisely this: an agency that promises a date LATER than Pen. Code
+# section 832.7(b)(11)'s 45 days has committed in writing to missing the statute, and surfacing
+# that is the whole point of keeping both rows.
+#
+# ---------------------------------------------------------------------------------------------
+# CLOCKS THAT ARE DELIBERATELY ABSENT BECAUSE count_from CANNOT EXPRESS THEM
+#
+# Every rule here counts from clock_start (the request). The following real statutory clocks do
+# NOT, and encoding them here would silently produce wrong dates:
+#
+#   Gov. Code section 7923.625   critical-incident video/audio: 45 calendar days, then up to one
+#                                year, then clear-and-convincing -- all running from "the date the
+#                                agency knew or reasonably should have known about the incident,"
+#                                plus a 30-day reassess-and-notify duty. Not from the request.
+#   Pen. Code section 832.7(b)(8)  60 days from the INCIDENT; 180-day justification intervals; an
+#                                18-month cap from the incident; and (b)(8)(C)'s 180 days running
+#                                from the agency's DISCOVERY of the misconduct or allegation.
+#   Pen. Code section 832.10(c)(4) the same structure for in-custody deaths, from the death
+#                                incident.
+#   Gov. Code section 7922.535(b)  the 14-day "unusual circumstances" extension. This is not a
+#                                third deadline_type; it moves an existing determination due date
+#                                (ceiling: day 24 from receipt -- Voice of San Diego, supra; City
+#                                of Gilroy v. Superior Court (2026) 19 Cal.5th 38, fn. 8). Model
+#                                it as an extension event on the deadline row, not as a rule.
+#
+# These belong in the request record as agency-asserted delay events with their own trigger
+# dates, not as rules in this file.
+#
+# ---------------------------------------------------------------------------------------------
+# PROVISION VOCABULARY
+#
+# provisions are free text a human types on a request item, so these strings are a convention,
+# not an enum. The two in use:
+#
+#   peace_officer_records      Pen. Code section 832.7(b) records (SB 1421 / SB 16): use of
+#                              force, sustained findings of misconduct, and the rest of the
+#                              (b)(1) list.
+#   custodial_death_records    Pen. Code section 832.10 records: a local detention facility's
+#                              investigation of a death in custody.
+#
+# Each carve-out carries BOTH a determination rule and a production rule. The determination
+# rules restate the same Gov. Code section 7922.535(a) clock as the general rule, and they exist
+# for two reasons: a request whose REQUEST-LEVEL provision is set to a carve-out with no
+# determination rule makes compute_deadlines raise NoRuleError (compute.py treats a missing
+# general determination rule as fatal), and without them every such item also emits an
+# UnresolvedProvision for statutory_determination. The cost is coupling: if the section
+# 7922.535(a) count ever changes, THREE determination rules change together, not one. The
+# AB 1821 block below spells out that edit.
+#
+# One consequence to know about: when a carve-out is used at ITEM level, the request emits two
+# determination rows with the same due date -- the request-level general one and the item-scoped
+# mirror -- distinguishable by request_item_id and rule_ref. That is how compute_deadlines models
+# an item-scoped obligation, not a bug, but if the ledger ever reads as noisy the fix is to drop
+# the mirrored determination rules and use carve-outs at item level ONLY; the request-level
+# provision field must then never be set to a carve-out, or filing raises NoRuleError.
+#
+# ---------------------------------------------------------------------------------------------
+# NOT ENTERED, ON PURPOSE
+#
+# Pre-2023 requests. Division 10 became operative January 1, 2023 (Gov. Code section 7931.000);
+# before that the same ten-day determination lived in former Gov. Code section 6253(c). No
+# historical rule is entered because the operative date of the ten-day language in the FORMER
+# section was not verified. If the portal ever needs to compute a pre-2023 request, add a rule
+# citing former section 6253(c) with effective_to = 2023-01-01 and set the general rule's
+# effective_from to match -- after checking that date.
+#
+# FOIA. 5 U.S.C. section 552(a)(6)(A)(i) sets 20 days "excepting Saturdays, Sundays, and legal
+# public holidays" -- a clean business_days rule -- but it needs a FEDERAL calendar, because the
+# legal public holidays in 5 U.S.C. section 6103 are a different list from Gov. Code section
+# 6700. It cannot reuse "california". Not entered until that calendar exists. (FOIA has the same
+# empty production slot as the CPRA: section 552(a)(3)(A) says only "promptly available.")
+#
+# Local sunshine ordinances. Gov. Code section 7922.505 lets an agency adopt faster standards for
+# itself, so a charter city ordinance is a real count and would be its own law value per city.
+# None entered -- each needs the ordinance text in hand, not a secondary summary.
+#
+# Any new law needs a [law.<value>] mapping in calendars.toml first: a rule under an unmapped law
+# loads fine and then makes compute_deadlines raise UnknownCalendarError at filing time.
+
+
+# --- CPRA: the general determination clock ---------------------------------------------------
+
+[[rule]]
+id = "cpra.determination.general.2023-01-01"
+law = "CPRA"
+provision = ""
+deadline_type = "statutory_determination"
+days = 10
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2023-01-01
+citation = "Cal. Gov. Code § 7922.535(a) -- 'within 10 days from receipt of the request'; operative date per § 7931.000"
+
+
+# --- CPRA carve-out: Pen. Code § 832.7(b) peace officer records -------------------------------
+
+[[rule]]
+id = "cpra.determination.peace_officer_records.2023-01-01"
+law = "CPRA"
+provision = "peace_officer_records"
+deadline_type = "statutory_determination"
+days = 10
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2023-01-01
+citation = "Cal. Gov. Code § 7922.535(a) -- the general determination clock; § 832.7(b) records are CPRA records and § 832.7 sets no separate determination deadline"
+
+[[rule]]
+id = "cpra.production.peace_officer_records.2023-01-01"
+law = "CPRA"
+provision = "peace_officer_records"
+deadline_type = "production"
+days = 45
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2023-01-01
+citation = "Cal. Pen. Code § 832.7(b)(11) -- 'at the earliest possible time and no later than 45 days from the date of a request for their disclosure'"
+
+
+# --- CPRA carve-out: Pen. Code § 832.10 in-custody death records ------------------------------
+
+[[rule]]
+id = "cpra.determination.custodial_death_records.2023-01-01"
+law = "CPRA"
+provision = "custodial_death_records"
+deadline_type = "statutory_determination"
+days = 10
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2023-01-01
+citation = "Cal. Gov. Code § 7922.535(a) -- the general determination clock; § 832.10(b) routes these records through the CPRA and sets no separate determination deadline"
+
+[[rule]]
+id = "cpra.production.custodial_death_records.2024-07-01"
+law = "CPRA"
+provision = "custodial_death_records"
+deadline_type = "production"
+days = 45
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2024-07-01
+citation = "Cal. Pen. Code § 832.10(c)(6) -- 'no later than 45 days from the date of a request for their disclosure'; § 832.10(h): 'This section shall become operative on July 1, 2024.'"
+
+
+# --- Campus foundations and auxiliary organizations (Educ. Code) ------------------------------
+#
+# These are NOT CPRA agencies and do not ride on law = "CPRA". Each statute is a near-copy of
+# Gov. Code § 7922.535 with four differences that matter:
+#
+#   1. The request must be WRITTEN. "Upon a written request for a copy or inspection of records"
+#      -- unlike the CPRA, where an agency may not even require a writing (Galbiso v. Orosi PUD
+#      (2008) 167 Cal.App.4th 1063). An oral request does not start these clocks.
+#   2. "10 CALENDAR days" is express, so none of the calendar-vs-working-days argument arises.
+#   3. Their unusual-circumstances lists still stop at FOUR grounds. Neither SB 1034 nor AB 370
+#      amended them, so these entities have NO cyberattack and NO state-of-emergency extension.
+#      One asserting either is asserting a ground its own statute does not contain.
+#   4. Educ. Code § 92953(d) says a UC foundation denial "shall NOT set forth the names and
+#      titles or positions of each person responsible for the denial" -- the opposite of Gov.
+#      Code § 7922.540 and the opposite of its own two sibling statutes, which say "shall set
+#      forth" (§§ 89914.5(d), 72693(d)). Not a transcription error; it is the enacted text.
+#
+# Production is modeled exactly as it is for the CPRA. All three require the determination to
+# "state the estimated date and time when the records will be made available," so the production
+# deadline is that stated date, opened as basis="agency_commitment" -- no general production rule
+# here either. No Penal Code carve-outs apply: a campus foundation or auxiliary organization is
+# not a law enforcement agency and does not hold § 832.7 or § 832.10 records.
+
+[[rule]]
+id = "uc_foundation.determination.general.2012-01-01"
+law = "UC_FOUNDATION"
+provision = ""
+deadline_type = "statutory_determination"
+days = 10
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2012-01-01
+citation = "Cal. Educ. Code § 92953(a) -- UC campus foundations; 'within 10 calendar days from the receipt of such request' on a WRITTEN request"
+
+[[rule]]
+id = "csu_auxiliary.determination.general.2012-01-01"
+law = "CSU_AUXILIARY"
+provision = ""
+deadline_type = "statutory_determination"
+days = 10
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2012-01-01
+citation = "Cal. Educ. Code § 89914.5(a) -- CSU auxiliary organizations; 'within 10 calendar days from the receipt of the request' on a WRITTEN request"
+
+[[rule]]
+id = "ccd_auxiliary.determination.general.2012-01-01"
+law = "CCD_AUXILIARY"
+provision = ""
+deadline_type = "statutory_determination"
+days = 10
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2012-01-01
+citation = "Cal. Educ. Code § 72693(a) -- community college district auxiliary organizations; 'within 10 calendar days from the receipt of the request' on a WRITTEN request"
+
+
+# ---------------------------------------------------------------------------------------------
+# PENDING -- AB 1821 (Pacheco). NOT LAW. Do not uncomment until it is chaptered.
+#
+# Passed August 25, 2026; enrolled and presented to the Governor August 31, 2026. Because it
+# passed before September 1 and reached the Governor on or after September 1, his outside date to
+# act is September 30, 2026 -- if not returned by then it becomes a statute without signature
+# (Cal. Const., art. IV, § 10(b)(2)). It would convert § 7922.535(a) to "10 BUSINESS days" and
+# § 7922.535(b) to "14 business days", operative January 1, 2027.
+#
+# If it is chaptered, the edit is: add effective_to = 2027-01-01 to all THREE determination rules
+# above, then uncomment all three blocks below. Confirm the enrolled text and the operative date
+# first -- the day counts below are transcribed from the enrolled version as reported, not from a
+# chaptered statute, which is exactly why they are commented out.
+#
+# [[rule]]
+# id = "cpra.determination.general.2027-01-01"
+# law = "CPRA"
+# provision = ""
+# deadline_type = "statutory_determination"
+# days = 10
+# unit = "business_days"
+# roll_forward_on_non_business_day = true
+# effective_from = 2027-01-01
+# citation = "Cal. Gov. Code § 7922.535(a) as amended by AB 1821 (2025-2026 Reg. Sess.) -- '10 business days'"
+#
+# [[rule]]
+# id = "cpra.determination.peace_officer_records.2027-01-01"
+# law = "CPRA"
+# provision = "peace_officer_records"
+# deadline_type = "statutory_determination"
+# days = 10
+# unit = "business_days"
+# roll_forward_on_non_business_day = true
+# effective_from = 2027-01-01
+# citation = "Cal. Gov. Code § 7922.535(a) as amended by AB 1821 (2025-2026 Reg. Sess.) -- '10 business days'"
+#
+# [[rule]]
+# id = "cpra.determination.custodial_death_records.2027-01-01"
+# law = "CPRA"
+# provision = "custodial_death_records"
+# deadline_type = "statutory_determination"
+# days = 10
+# unit = "business_days"
+# roll_forward_on_non_business_day = true
+# effective_from = 2027-01-01
+# citation = "Cal. Gov. Code § 7922.535(a) as amended by AB 1821 (2025-2026 Reg. Sess.) -- '10 business days'"
+#
+# Note AB 1821 does NOT touch Pen. Code § 832.7(b)(11) or § 832.10(c)(6); those stay 45 calendar
+# days. It also does not touch the Educ. Code campus-foundation and auxiliary statutes.
+#
+# ---------------------------------------------------------------------------------------------
+# Template (fully commented out; every value below is an obvious placeholder, not a real
+# statutory number or citation -- replace every field before uncommenting):
+#
+# [[rule]]
+# id = "REPLACE_ME"
+# law = "REPLACE_ME"
+# provision = ""
+# deadline_type = "statutory_determination"
+# days = 0
+# unit = "calendar_days"
+# roll_forward_on_non_business_day = true
+# effective_from = 1900-01-01
+# citation = "REPLACE_ME -- the statute section this count comes from"

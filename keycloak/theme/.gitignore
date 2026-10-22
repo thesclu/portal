@@ -1,0 +1,3 @@
+# The portal's tokens, fonts and logo, copied in before each build (scripts/portal-assets.mjs).
+/src/portal/
+/src/email/resources/img/sclu-letters-blue.png

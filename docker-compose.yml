@@ -1,0 +1,16 @@
+# For machines without a local Postgres. The Homebrew install is the default
+# on owner's Mac; this gives anyone else an identical database with one command.
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: portal_owner
+      POSTGRES_DB: sclu_portal
+      POSTGRES_HOST_AUTH_METHOD: trust   # development only
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:

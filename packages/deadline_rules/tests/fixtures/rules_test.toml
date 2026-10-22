@@ -1,0 +1,36 @@
+# Fixture rule data for deadline_rules tests. Every rule here is under the fictional law
+# "TESTLAW" with a fictional citation -- never a real statute, never a real deadline.
+
+[[rule]]
+id = "testlaw.determination.general.2020-01-01"
+law = "TESTLAW"
+provision = ""
+deadline_type = "statutory_determination"
+days = 7
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2020-01-01
+effective_to = 2026-06-01
+citation = "TESTLAW § 1(a) (fictional statute, for tests only)"
+
+[[rule]]
+id = "testlaw.determination.general.2026-06-01"
+law = "TESTLAW"
+provision = ""
+deadline_type = "statutory_determination"
+days = 9
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2026-06-01
+citation = "TESTLAW § 1(b) (fictional statute, for tests only, supersedes 2020-01-01 rule)"
+
+[[rule]]
+id = "testlaw.production.widgets.2020-01-01"
+law = "TESTLAW"
+provision = "widgets"
+deadline_type = "production"
+days = 12
+unit = "business_days"
+roll_forward_on_non_business_day = true
+effective_from = 2020-01-01
+citation = "TESTLAW § 2 (fictional statute, for tests only)"

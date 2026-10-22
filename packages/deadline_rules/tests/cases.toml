@@ -1,0 +1,128 @@
+# Table-driven cases for test_compute.py, run against fixtures/rules_test.toml and
+# fixtures/calendars_test.toml (law TESTLAW, calendar testland: weekends + holidays
+# 2026-01-13 and 2026-11-11). Every date and number here is fictional, under TESTLAW only.
+#
+# Each [[case]] is either a success case (one or more [[case.expected]] sub-tables, each one
+# DeadlineSpec field-for-field) or an error case (`error = "NoRuleError"`). An [[case.expected]]
+# table OMITS `provision` / `request_item_id` to mean None -- TOML has no null literal, so
+# "absent key" is the sentinel test_compute.py's loader uses for both fields.
+
+[[case]]
+name = "baseline_no_roll_needed"
+description = "plain calendar-day count landing on an ordinary weekday: no roll needed"
+clock_start = 2020-03-02
+
+[[case.expected]]
+deadline_type = "statutory_determination"
+due_at = 2020-03-09
+rule_ref = "testlaw.determination.general.2020-01-01"
+citation = "TESTLAW § 1(a) (fictional statute, for tests only)"
+
+[[case]]
+name = "weekend_roll"
+description = "raw due date lands on a Saturday; rolls forward to the following Monday"
+clock_start = 2026-01-03
+
+[[case.expected]]
+deadline_type = "statutory_determination"
+due_at = 2026-01-12
+rule_ref = "testlaw.determination.general.2020-01-01"
+citation = "TESTLAW § 1(a) (fictional statute, for tests only)"
+
+[[case]]
+name = "holiday_roll"
+description = "raw due date lands exactly on the 2026-01-13 testland holiday (a weekday); rolls to the next business day"
+clock_start = 2026-01-06
+
+[[case.expected]]
+deadline_type = "statutory_determination"
+due_at = 2026-01-14
+rule_ref = "testlaw.determination.general.2020-01-01"
+citation = "TESTLAW § 1(a) (fictional statute, for tests only)"
+
+[[case]]
+name = "effective_from_is_inclusive"
+description = "clock_start exactly equal to the general rule's effective_from still selects it"
+clock_start = 2020-01-01
+
+[[case.expected]]
+deadline_type = "statutory_determination"
+due_at = 2020-01-08
+rule_ref = "testlaw.determination.general.2020-01-01"
+citation = "TESTLAW § 1(a) (fictional statute, for tests only)"
+
+[[case]]
+name = "effective_to_is_exclusive_at_switchover"
+description = "clock_start exactly equal to the superseding rule's effective_from (= the old rule's effective_to) selects the NEW rule, not the old one"
+clock_start = 2026-06-01
+
+[[case.expected]]
+deadline_type = "statutory_determination"
+due_at = 2026-06-10
+rule_ref = "testlaw.determination.general.2026-06-01"
+citation = "TESTLAW § 1(b) (fictional statute, for tests only, supersedes 2020-01-01 rule)"
+
+[[case]]
+name = "old_rule_still_applies_the_day_before_switchover"
+description = "one day before the switchover date, the old rule is still in force (complements the exclusive-boundary case above)"
+clock_start = 2026-05-31
+
+[[case.expected]]
+deadline_type = "statutory_determination"
+due_at = 2026-06-08
+rule_ref = "testlaw.determination.general.2020-01-01"
+citation = "TESTLAW § 1(a) (fictional statute, for tests only)"
+
+[[case]]
+name = "item_scoped_provision"
+description = "an item carrying the 'widgets' provision gets its own production deadline in addition to the request-level determination deadline; there is no general production rule, so the request-level production clock produces no row"
+clock_start = 2026-02-02
+
+[[case.items]]
+id = "item-1"
+provisions = ["widgets"]
+
+[[case.expected]]
+deadline_type = "production"
+due_at = 2026-02-18
+provision = "widgets"
+request_item_id = "item-1"
+rule_ref = "testlaw.production.widgets.2020-01-01"
+citation = "TESTLAW § 2 (fictional statute, for tests only)"
+
+[[case.expected]]
+deadline_type = "statutory_determination"
+due_at = 2026-02-09
+rule_ref = "testlaw.determination.general.2020-01-01"
+citation = "TESTLAW § 1(a) (fictional statute, for tests only)"
+
+[[case]]
+name = "override_id_forces_a_specific_rule"
+description = "clock_start is within the superseding rule's window, but overrides names the earlier rule explicitly -- the override wins"
+clock_start = 2026-09-08
+
+[case.overrides]
+statutory_determination = "testlaw.determination.general.2020-01-01"
+
+[[case.expected]]
+deadline_type = "statutory_determination"
+due_at = 2026-09-15
+rule_ref = "testlaw.determination.general.2020-01-01"
+citation = "TESTLAW § 1(a) (fictional statute, for tests only)"
+
+[[case]]
+name = "missing_production_rule_yields_no_row"
+description = "no general production rule exists for TESTLAW; the determination row still comes back, with nothing for production and no error"
+clock_start = 2026-09-08
+
+[[case.expected]]
+deadline_type = "statutory_determination"
+due_at = 2026-09-17
+rule_ref = "testlaw.determination.general.2026-06-01"
+citation = "TESTLAW § 1(b) (fictional statute, for tests only, supersedes 2020-01-01 rule)"
+
+[[case]]
+name = "missing_determination_rule_raises"
+description = "clock_start is before either determination rule's effective_from; the general determination clock is mandatory, so this raises NoRuleError"
+clock_start = 2019-06-15
+error = "NoRuleError"

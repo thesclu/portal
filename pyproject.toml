@@ -1,0 +1,94 @@
+[project]
+name = "sclu-portal"
+version = "0.1.0"
+description = "SCLU Portal: Django backend for the records-request ledger and future apps"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "django>=6.1,<6.2",
+    "django-ninja>=1.7,<2",
+    "psycopg[binary]>=3.3,<4",
+    "procrastinate>=3.9,<4",
+    "django-environ>=0.14,<1",
+    "django-storages>=1.14,<2",
+    "deadline-rules",
+    "pypdf>=5,<7",
+    "whitenoise>=6.9,<7",
+    "boto3>=1.35,<2",
+    "reportlab>=5.0.1",
+    "xhtml2pdf>=0.2.21",
+    "cryptography>=50.0.2",
+    "google-genai>=2.28.0",
+    "anthropic>=1.11.0",
+    "channels[daphne]>=4.3.2",
+    "channels-redis>=4.3.0",
+    "uvicorn>=0.35",
+    "websockets>=14",
+    # P21c: the drafting tool's client (portal/drafting/mike.py); tests fake it at the transport.
+    "httpx>=0.28.1,<1",
+    # P25a: sign-in is Keycloak's (DECISIONS 51, 52). The portal is an OpenID Connect client
+    # (Authlib: the code flow with PKCE, state and nonce, ID and logout token checks with its JOSE
+    # library, joserfc) and drives Keycloak's admin API through python-keycloak. Both speak HTTP
+    # through requests; the tests fake Keycloak there (responses).
+    "authlib>=1.9.1,<2",
+    "joserfc>=1.7,<2",
+    "python-keycloak==7.1.1",
+    "openpyxl>=3.1.5,<4",
+    "defusedxml>=0.7.1,<1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9,<10",
+    "pytest-django>=4.14,<5",
+    "ruff>=0.16",
+    "mypy>=2.3",
+    "django-stubs[compatible-mypy]>=6.1",
+    "pre-commit>=4",
+    "responses>=0.26,<0.27",
+]
+
+[tool.uv]
+package = false
+
+[tool.uv.sources]
+deadline-rules = { workspace = true }
+
+[tool.uv.workspace]
+members = ["packages/deadline_rules"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "portal.settings"
+pythonpath = ["backend"]
+testpaths = ["backend/tests", "packages/deadline_rules/tests"]
+addopts = "-q --strict-markers"
+markers = [
+    "app_role: run the test body as the portal_app database role",
+    "unfinished_setup: people are made as production makes them, the new-user setup not finished (P23a)",
+    "keycloak_integration: runs against the real development Keycloak; skipped when it is not up (P25a)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["backend/portal/*/migrations/*"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "DJ"]
+# DJ001 wants no null=True on text fields; the records models mirror schema.sql, whose text columns are nullable.
+ignore = ["DJ001"]
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["mypy_django_plugin.main"]
+mypy_path = "backend"
+check_untyped_defs = true
+warn_unused_ignores = true
+exclude = ["migrations/"]
+
+# P22: Django Channels and daphne ship no type stubs. P25a: nor do Authlib or python-keycloak.
+[[tool.mypy.overrides]]
+module = ["channels.*", "daphne.*", "authlib.*", "keycloak.*"]
+ignore_missing_imports = true
+
+[tool.django-stubs]
+django_settings_module = "portal.settings"

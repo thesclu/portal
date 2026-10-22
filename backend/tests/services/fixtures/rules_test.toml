@@ -1,0 +1,35 @@
+# Fictional rule data for the service-layer tests. Every rule is under the invented law "TESTLAW"
+# with an invented citation. No real statute, no real day count, no real deadline.
+
+[[rule]]
+id = "testlaw.determination.general.2020-01-01"
+law = "TESTLAW"
+provision = ""
+deadline_type = "statutory_determination"
+days = 7
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2020-01-01
+citation = "TESTLAW § 1 (fictional statute, for tests only)"
+
+[[rule]]
+id = "testlaw.production.general.2020-01-01"
+law = "TESTLAW"
+provision = ""
+deadline_type = "production"
+days = 30
+unit = "calendar_days"
+roll_forward_on_non_business_day = true
+effective_from = 2020-01-01
+citation = "TESTLAW § 2 (fictional statute, for tests only)"
+
+[[rule]]
+id = "testlaw.production.widgets.2020-01-01"
+law = "TESTLAW"
+provision = "widgets"
+deadline_type = "production"
+days = 12
+unit = "business_days"
+roll_forward_on_non_business_day = true
+effective_from = 2020-01-01
+citation = "TESTLAW § 3 (fictional statute, for tests only)"

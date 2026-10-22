@@ -1,0 +1,1259 @@
+{
+  "realm": "sclu",
+  "enabled": true,
+  "displayName": "SCLU Portal",
+  "sslRequired": "$(env:SCLU_SSL_REQUIRED)",
+  "registrationAllowed": false,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "editUsernameAllowed": false,
+  "resetPasswordAllowed": true,
+  "rememberMe": false,
+  "verifyEmail": false,
+  "internationalizationEnabled": false,
+  "loginTheme": "sclu",
+  "emailTheme": "sclu",
+  "organizationsEnabled": false,
+  "bruteForceProtected": true,
+  "permanentLockout": false,
+  "maxTemporaryLockouts": 0,
+  "bruteForceStrategy": "MULTIPLE",
+  "failureFactor": 5,
+  "waitIncrementSeconds": 900,
+  "maxFailureWaitSeconds": 900,
+  "maxDeltaTimeSeconds": 900,
+  "minimumQuickLoginWaitSeconds": 60,
+  "quickLoginCheckMilliSeconds": 1000,
+  "passwordPolicy": "length(12) and maxLength(256) and notUsername and notEmail and passwordBlacklist(common-passwords.txt)",
+  "ssoSessionIdleTimeout": 28800,
+  "ssoSessionMaxLifespan": 86400,
+  "accessTokenLifespan": 300,
+  "accessCodeLifespan": 60,
+  "accessCodeLifespanLogin": 1800,
+  "accessCodeLifespanUserAction": 300,
+  "actionTokenGeneratedByUserLifespan": 1800,
+  "actionTokenGeneratedByAdminLifespan": 604800,
+  "revokeRefreshToken": false,
+  "offlineSessionMaxLifespanEnabled": true,
+  "offlineSessionIdleTimeout": 28800,
+  "offlineSessionMaxLifespan": 86400,
+  "eventsEnabled": true,
+  "eventsExpiration": 2592000,
+  "adminEventsEnabled": true,
+  "adminEventsDetailsEnabled": false,
+  "otpPolicyType": "totp",
+  "otpPolicyAlgorithm": "HmacSHA1",
+  "otpPolicyDigits": 6,
+  "otpPolicyPeriod": 30,
+  "otpPolicyLookAheadWindow": 1,
+  "otpPolicyCodeReusable": false,
+  "webAuthnPolicyRpEntityName": "SCLU Portal",
+  "webAuthnPolicyRpId": "",
+  "webAuthnPolicyAttestationConveyancePreference": "none",
+  "webAuthnPolicyAuthenticatorAttachment": "not specified",
+  "webAuthnPolicyRequireResidentKey": "Yes",
+  "webAuthnPolicyUserVerificationRequirement": "required",
+  "webAuthnPolicyAvoidSameAuthenticatorRegister": true,
+  "webAuthnPolicyCreateTimeout": 0,
+  "webAuthnPolicyPasswordlessRpEntityName": "SCLU Portal",
+  "webAuthnPolicyPasswordlessPasskeysEnabled": false,
+  "browserFlow": "sclu tools browser",
+  "resetCredentialsFlow": "sclu reset credentials",
+  "attributes": {
+    "acr.loa.map": "{\"password\":1,\"second-step\":2}",
+    "userProfileEnabled": "true"
+  },
+  "smtpServer": {
+    "host": "$(env:SCLU_SMTP_HOST)",
+    "port": "$(env:SCLU_SMTP_PORT)",
+    "from": "$(env:SCLU_SMTP_FROM)",
+    "fromDisplayName": "SCLU Portal",
+    "starttls": "$(env:SCLU_SMTP_STARTTLS)",
+    "ssl": "false",
+    "auth": "$(env:SCLU_SMTP_AUTH)",
+    "user": "$(env:SCLU_SMTP_USER)",
+    "password": "$(env:SCLU_SMTP_PASSWORD)"
+  },
+  "userProfile": {
+    "attributes": [
+      {
+        "name": "username",
+        "displayName": "${username}",
+        "validations": {
+          "length": {
+            "min": 3,
+            "max": 255
+          },
+          "username-prohibited-characters": {},
+          "up-username-not-idn-homograph": {}
+        },
+        "permissions": {
+          "view": [
+            "admin",
+            "user"
+          ],
+          "edit": [
+            "admin"
+          ]
+        },
+        "multivalued": false
+      },
+      {
+        "name": "email",
+        "displayName": "${email}",
+        "validations": {
+          "email": {},
+          "length": {
+            "max": 255
+          }
+        },
+        "required": {
+          "roles": [
+            "user"
+          ]
+        },
+        "permissions": {
+          "view": [
+            "admin",
+            "user"
+          ],
+          "edit": [
+            "admin"
+          ]
+        },
+        "multivalued": false
+      },
+      {
+        "name": "firstName",
+        "displayName": "${firstName}",
+        "validations": {
+          "length": {
+            "max": 255
+          },
+          "person-name-prohibited-characters": {}
+        },
+        "permissions": {
+          "view": [
+            "admin",
+            "user"
+          ],
+          "edit": [
+            "admin"
+          ]
+        },
+        "multivalued": false
+      },
+      {
+        "name": "lastName",
+        "displayName": "${lastName}",
+        "validations": {
+          "length": {
+            "max": 255
+          },
+          "person-name-prohibited-characters": {}
+        },
+        "permissions": {
+          "view": [
+            "admin",
+            "user"
+          ],
+          "edit": [
+            "admin"
+          ]
+        },
+        "multivalued": false
+      },
+      {
+        "name": "sclu_uid",
+        "displayName": "Portal person id",
+        "permissions": {
+          "view": [
+            "admin"
+          ],
+          "edit": [
+            "admin"
+          ]
+        },
+        "multivalued": false,
+        "group": "sclu"
+      },
+      {
+        "name": "sclu_role",
+        "displayName": "Portal role",
+        "validations": {
+          "options": {
+            "options": [
+              "admin",
+              "staff",
+              "staff_attorney",
+              "limited_attorney",
+              "intern"
+            ]
+          }
+        },
+        "permissions": {
+          "view": [
+            "admin"
+          ],
+          "edit": [
+            "admin"
+          ]
+        },
+        "multivalued": false,
+        "group": "sclu"
+      },
+      {
+        "name": "sclu_role_label",
+        "displayName": "Portal role, as read",
+        "permissions": {
+          "view": [
+            "admin"
+          ],
+          "edit": [
+            "admin"
+          ]
+        },
+        "multivalued": false,
+        "group": "sclu"
+      },
+      {
+        "name": "sclu_org",
+        "displayName": "Organisation",
+        "permissions": {
+          "view": [
+            "admin"
+          ],
+          "edit": [
+            "admin"
+          ]
+        },
+        "multivalued": false,
+        "group": "sclu"
+      },
+      {
+        "name": "sclu_invited_by",
+        "displayName": "Invited by",
+        "permissions": {
+          "view": [
+            "admin"
+          ],
+          "edit": [
+            "admin"
+          ]
+        },
+        "multivalued": false,
+        "group": "sclu"
+      }
+    ],
+    "groups": [
+      {
+        "name": "user-metadata",
+        "displayHeader": "User metadata",
+        "displayDescription": "Attributes, which refer to user metadata"
+      },
+      {
+        "name": "sclu",
+        "displayHeader": "Set by the portal",
+        "displayDescription": "The portal is the authority for these (P25a); a change here is overwritten at the portal's next sync."
+      }
+    ]
+  },
+  "requiredActions": [
+    {
+      "alias": "UPDATE_PASSWORD",
+      "name": "Update Password",
+      "providerId": "UPDATE_PASSWORD",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 30,
+      "config": {}
+    },
+    {
+      "alias": "webauthn-register",
+      "name": "Webauthn Register",
+      "providerId": "webauthn-register",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 70,
+      "config": {}
+    },
+    {
+      "alias": "CONFIGURE_RECOVERY_AUTHN_CODES",
+      "name": "Recovery Authentication Codes",
+      "providerId": "CONFIGURE_RECOVERY_AUTHN_CODES",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 130,
+      "config": {
+        "warning_threshold": "4"
+      }
+    },
+    {
+      "alias": "CONFIGURE_TOTP",
+      "name": "Configure OTP",
+      "providerId": "CONFIGURE_TOTP",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 10,
+      "config": {
+        "add-recovery-codes": "false"
+      }
+    },
+    {
+      "alias": "delete_credential",
+      "name": "Delete Credential",
+      "providerId": "delete_credential",
+      "enabled": true,
+      "defaultAction": false,
+      "priority": 100,
+      "config": {}
+    },
+    {
+      "alias": "webauthn-register-passwordless",
+      "name": "Webauthn Register Passwordless",
+      "providerId": "webauthn-register-passwordless",
+      "enabled": false,
+      "defaultAction": false,
+      "priority": 80,
+      "config": {}
+    },
+    {
+      "alias": "UPDATE_PROFILE",
+      "name": "Update Profile",
+      "providerId": "UPDATE_PROFILE",
+      "enabled": false,
+      "defaultAction": false,
+      "priority": 40,
+      "config": {}
+    },
+    {
+      "alias": "UPDATE_EMAIL",
+      "name": "Update Email",
+      "providerId": "UPDATE_EMAIL",
+      "enabled": false,
+      "defaultAction": false,
+      "priority": 70,
+      "config": {}
+    },
+    {
+      "alias": "delete_account",
+      "name": "Delete Account",
+      "providerId": "delete_account",
+      "enabled": false,
+      "defaultAction": false,
+      "priority": 60,
+      "config": {}
+    },
+    {
+      "alias": "TERMS_AND_CONDITIONS",
+      "name": "Terms and Conditions",
+      "providerId": "TERMS_AND_CONDITIONS",
+      "enabled": false,
+      "defaultAction": false,
+      "priority": 20,
+      "config": {}
+    }
+  ],
+  "authenticatorConfig": [
+    {
+      "alias": "sclu portal loa 1",
+      "config": {
+        "loa-condition-level": "1",
+        "loa-max-age": "86400"
+      }
+    },
+    {
+      "alias": "sclu portal loa 2",
+      "config": {
+        "loa-condition-level": "2",
+        "loa-max-age": "14400"
+      }
+    },
+    {
+      "alias": "sclu tools loa 1",
+      "config": {
+        "loa-condition-level": "1",
+        "loa-max-age": "86400"
+      }
+    },
+    {
+      "alias": "sclu tools loa 2",
+      "config": {
+        "loa-condition-level": "2",
+        "loa-max-age": "1800"
+      }
+    },
+    {
+      "alias": "sclu portal no second step yet",
+      "config": {
+        "flow_to_check": "sclu portal second step known",
+        "check_result": "not-executed"
+      }
+    },
+    {
+      "alias": "sclu tools no second step yet",
+      "config": {
+        "flow_to_check": "sclu tools second step known",
+        "check_result": "not-executed"
+      }
+    },
+    {
+      "alias": "sclu portal no second step yet for the app",
+      "config": {
+        "flow_to_check": "sclu portal second step known",
+        "check_result": "not-executed"
+      }
+    },
+    {
+      "alias": "sclu portal app asked for",
+      "config": {
+        "client_scope": "sclu-app-second-step",
+        "negate": "false"
+      }
+    },
+    {
+      "alias": "sclu portal app not chosen",
+      "config": {
+        "flow_to_check": "sclu portal first app",
+        "check_result": "not-executed"
+      }
+    },
+    {
+      "alias": "sclu tools no second step yet for the app",
+      "config": {
+        "flow_to_check": "sclu tools second step known",
+        "check_result": "not-executed"
+      }
+    },
+    {
+      "alias": "sclu tools app asked for",
+      "config": {
+        "client_scope": "sclu-app-second-step",
+        "negate": "false"
+      }
+    },
+    {
+      "alias": "sclu tools app not chosen",
+      "config": {
+        "flow_to_check": "sclu tools first app",
+        "check_result": "not-executed"
+      }
+    }
+  ],
+  "authenticationFlows": [
+    {
+      "alias": "sclu portal browser",
+      "description": "The portal's sign-in: the password (level 1), then the second step (level 2), asked again once the second step is older than the portal's re-verification age (Settings).",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-cookie",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "flowAlias": "sclu portal forms",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu portal forms",
+      "description": "Each level of authentication that was asked for and is not yet satisfied.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 10,
+          "flowAlias": "sclu portal password",
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 20,
+          "flowAlias": "sclu portal second step",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu portal password",
+      "description": "Level 1: email and password.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-level-of-authentication",
+          "authenticatorConfig": "sclu portal loa 1",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-username-password-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu portal second step",
+      "description": "Level 2: the second step the person has (a passkey, an authenticator app, a recovery code); someone with none sets one up now: an app if the sign-in asked for one, otherwise a passkey; then recovery codes.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-level-of-authentication",
+          "authenticatorConfig": "sclu portal loa 2",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 20,
+          "flowAlias": "sclu portal second step known",
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 30,
+          "flowAlias": "sclu portal first app",
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 40,
+          "flowAlias": "sclu portal first passkey",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu portal second step known",
+      "description": "The second step the person already has: a passkey, an authenticator app (while Settings allows them) or a recovery code; someone with both is offered the passkey first.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-user-configured",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "webauthn-authenticator",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-recovery-authn-code-form",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 40,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu portal first app",
+      "description": "Someone with no second step yet whose sign-in asked for an authenticator app (the sclu-app-second-step scope) sets one up now, then saves recovery codes. DISABLED while Settings does not allow authenticator apps.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-sub-flow-executed",
+          "authenticatorConfig": "sclu portal no second step yet for the app",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "conditional-client-scope",
+          "authenticatorConfig": "sclu portal app asked for",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 30,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-recovery-authn-code-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 40,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu portal first passkey",
+      "description": "Nobody signs in on a password alone: someone with no second step yet, who did not ask for an authenticator app, registers a passkey now (webauthn-register), then saves recovery codes.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-sub-flow-executed",
+          "authenticatorConfig": "sclu portal no second step yet",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "conditional-sub-flow-executed",
+          "authenticatorConfig": "sclu portal app not chosen",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "webauthn-authenticator",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 30,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-recovery-authn-code-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 40,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu tools browser",
+      "description": "Every other application's sign-in (the drafting tool, chat, the Mac app) and the realm's default: as the portal's, with the second step asked again once it is older than the tools' re-verification age (Settings).",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "auth-cookie",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "flowAlias": "sclu tools forms",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu tools forms",
+      "description": "Each level of authentication that was asked for and is not yet satisfied.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 10,
+          "flowAlias": "sclu tools password",
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 20,
+          "flowAlias": "sclu tools second step",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu tools password",
+      "description": "Level 1: email and password.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-level-of-authentication",
+          "authenticatorConfig": "sclu tools loa 1",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-username-password-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu tools second step",
+      "description": "Level 2: the second step the person has (a passkey, an authenticator app, a recovery code); someone with none sets one up now: an app if the sign-in asked for one, otherwise a passkey; then recovery codes.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-level-of-authentication",
+          "authenticatorConfig": "sclu tools loa 2",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 20,
+          "flowAlias": "sclu tools second step known",
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 30,
+          "flowAlias": "sclu tools first app",
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "CONDITIONAL",
+          "priority": 40,
+          "flowAlias": "sclu tools first passkey",
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu tools second step known",
+      "description": "The second step the person already has: a passkey, an authenticator app (while Settings allows them) or a recovery code; someone with both is offered the passkey first.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-user-configured",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "webauthn-authenticator",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-recovery-authn-code-form",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 40,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu tools first app",
+      "description": "Someone with no second step yet whose sign-in asked for an authenticator app (the sclu-app-second-step scope) sets one up now, then saves recovery codes. DISABLED while Settings does not allow authenticator apps.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-sub-flow-executed",
+          "authenticatorConfig": "sclu tools no second step yet for the app",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "conditional-client-scope",
+          "authenticatorConfig": "sclu tools app asked for",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 30,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-recovery-authn-code-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 40,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu tools first passkey",
+      "description": "Nobody signs in on a password alone: someone with no second step yet, who did not ask for an authenticator app, registers a passkey now (webauthn-register), then saves recovery codes.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "conditional-sub-flow-executed",
+          "authenticatorConfig": "sclu tools no second step yet",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "conditional-sub-flow-executed",
+          "authenticatorConfig": "sclu tools app not chosen",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "webauthn-authenticator",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 30,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-recovery-authn-code-form",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 40,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu reset credentials",
+      "description": "Forgot password: the link by email, then the second step, then the new password. Neither the email nor the password alone is enough.",
+      "providerId": "basic-flow",
+      "topLevel": true,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "reset-credentials-choose-user",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "reset-credential-email",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 20,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticatorFlow": true,
+          "requirement": "REQUIRED",
+          "priority": 30,
+          "flowAlias": "sclu reset second step",
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "reset-password",
+          "authenticatorFlow": false,
+          "requirement": "REQUIRED",
+          "priority": 40,
+          "userSetupAllowed": false
+        }
+      ]
+    },
+    {
+      "alias": "sclu reset second step",
+      "description": "The second step before a new password is chosen: a passkey, an authenticator app (while Settings allows them) or a recovery code.",
+      "providerId": "basic-flow",
+      "topLevel": false,
+      "builtIn": false,
+      "authenticationExecutions": [
+        {
+          "authenticator": "webauthn-authenticator",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 10,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-otp-form",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 20,
+          "userSetupAllowed": false
+        },
+        {
+          "authenticator": "auth-recovery-authn-code-form",
+          "authenticatorFlow": false,
+          "requirement": "ALTERNATIVE",
+          "priority": 30,
+          "userSetupAllowed": false
+        }
+      ]
+    }
+  ],
+  "clientScopes": [
+    {
+      "name": "sclu",
+      "description": "What the portal says about a person: their role, their organisation and their portal id (P25a).",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      },
+      "protocolMappers": [
+        {
+          "name": "sclu_role",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "sclu_role",
+            "claim.name": "sclu_role",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        },
+        {
+          "name": "sclu_org",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "sclu_org",
+            "claim.name": "sclu_org",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        },
+        {
+          "name": "sclu_uid",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-attribute-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.attribute": "sclu_uid",
+            "claim.name": "sclu_uid",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        },
+        {
+          "name": "sclu_loa",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usersessionmodel-note-mapper",
+          "consentRequired": false,
+          "config": {
+            "user.session.note": "loa-map",
+            "claim.name": "sclu_loa",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "false",
+            "userinfo.token.claim": "false",
+            "introspection.token.claim": "false"
+          }
+        }
+      ]
+    },
+    {
+      "name": "sclu-app-second-step",
+      "description": "Asked for by the portal when someone setting up their second step chooses an authenticator app (P25c): the first-app branch of the second step runs. No claims.",
+      "protocol": "openid-connect",
+      "attributes": {
+        "include.in.token.scope": "false",
+        "display.on.consent.screen": "false"
+      }
+    }
+  ],
+  "clients": [
+    {
+      "clientId": "portal",
+      "name": "SCLU Portal",
+      "description": "The portal's server (backend for frontend): the authorization code flow with PKCE; the browser never holds a token (P25a).",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "$(env:KEYCLOAK_PORTAL_CLIENT_SECRET)",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "consentRequired": false,
+      "fullScopeAllowed": false,
+      "frontchannelLogout": false,
+      "rootUrl": "$(env:SCLU_PORTAL_URL)",
+      "baseUrl": "$(env:SCLU_PORTAL_URL)/",
+      "redirectUris": [
+        "$(env:SCLU_PORTAL_URL)/api/core/auth/oidc/callback"
+      ],
+      "webOrigins": [],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "$(env:SCLU_PORTAL_URL)/signed-out",
+        "backchannel.logout.url": "$(env:SCLU_PORTAL_BACKCHANNEL_URL)/api/core/auth/oidc/backchannel-logout",
+        "backchannel.logout.session.required": "true",
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "minimum.acr.value": "second-step",
+        "default.acr.values": "second-step",
+        "use.refresh.tokens": "true",
+        "client_credentials.use_refresh_token": "false",
+        "id.token.signed.response.alg": "RS256",
+        "exclude.session.state.from.auth.response": "false"
+      },
+      "authenticationFlowBindingOverrides": {
+        "browser": "sclu portal browser"
+      },
+      "defaultClientScopes": [
+        "acr",
+        "basic",
+        "profile",
+        "email",
+        "sclu"
+      ],
+      "optionalClientScopes": [
+        "sclu-app-second-step"
+      ]
+    },
+    {
+      "clientId": "portal-admin",
+      "name": "SCLU Portal (administration)",
+      "description": "The portal's service account for the admin API: people, their sessions, and the sign-in policies Settings writes (P25a). Never signs anyone in.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "$(env:KEYCLOAK_ADMIN_CLIENT_SECRET)",
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "consentRequired": false,
+      "fullScopeAllowed": false,
+      "frontchannelLogout": false,
+      "attributes": {
+        "access.token.lifespan": "300"
+      },
+      "defaultClientScopes": [
+        "basic",
+        "roles"
+      ],
+      "optionalClientScopes": []
+    },
+    {
+      "clientId": "drafting",
+      "name": "SCLU Drafting",
+      "description": "The drafting tool (apps/mike) through GoTrue's Keycloak provider (P25b): confidential, code flow; no PKCE (GoTrue's provider sends none); the tools' flow; back-channel logout to the fork.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "$(env:KEYCLOAK_DRAFTING_CLIENT_SECRET)",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "consentRequired": false,
+      "fullScopeAllowed": false,
+      "frontchannelLogout": false,
+      "rootUrl": "$(env:SCLU_DRAFTING_URL)",
+      "baseUrl": "$(env:SCLU_DRAFTING_URL)/",
+      "redirectUris": [
+        "$(env:SCLU_DRAFTING_AUTH_URL)/auth/v1/callback"
+      ],
+      "webOrigins": [],
+      "attributes": {
+        "pkce.code.challenge.method": "",
+        "post.logout.redirect.uris": "$(env:SCLU_DRAFTING_URL)/login",
+        "backchannel.logout.url": "$(env:SCLU_DRAFTING_BACKCHANNEL_URL)/sclu/keycloak/backchannel-logout",
+        "backchannel.logout.session.required": "true",
+        "backchannel.logout.revoke.offline.tokens": "false",
+        "minimum.acr.value": "second-step",
+        "default.acr.values": "second-step",
+        "use.refresh.tokens": "true",
+        "id.token.signed.response.alg": "RS256",
+        "exclude.session.state.from.auth.response": "false"
+      },
+      "authenticationFlowBindingOverrides": {
+        "browser": "sclu tools browser"
+      },
+      "defaultClientScopes": [
+        "acr",
+        "basic",
+        "profile",
+        "email",
+        "sclu"
+      ],
+      "optionalClientScopes": []
+    },
+    {
+      "clientId": "chat",
+      "name": "Team chat",
+      "description": "Placeholder: the encrypted chat's server (confidential, code + PKCE). Off until chat is built.",
+      "enabled": false,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "consentRequired": false,
+      "fullScopeAllowed": false,
+      "frontchannelLogout": false,
+      "redirectUris": [],
+      "webOrigins": [],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "backchannel.logout.session.required": "true",
+        "minimum.acr.value": "second-step",
+        "default.acr.values": "second-step"
+      },
+      "defaultClientScopes": [
+        "acr",
+        "basic",
+        "profile",
+        "email",
+        "sclu"
+      ],
+      "optionalClientScopes": []
+    },
+    {
+      "clientId": "mac-app",
+      "name": "SCLU for Mac",
+      "description": "Placeholder: the Mac app (public, code + PKCE, a loopback or app redirect). Off until the app is built.",
+      "enabled": false,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "consentRequired": false,
+      "fullScopeAllowed": false,
+      "frontchannelLogout": false,
+      "redirectUris": [],
+      "webOrigins": [],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "minimum.acr.value": "second-step",
+        "default.acr.values": "second-step"
+      },
+      "defaultClientScopes": [
+        "acr",
+        "basic",
+        "profile",
+        "email",
+        "sclu"
+      ],
+      "optionalClientScopes": []
+    },
+    {
+      "clientId": "account-console",
+      "enabled": false
+    }
+  ],
+  "users": [
+    {
+      "username": "service-account-portal-admin",
+      "enabled": true,
+      "serviceAccountClientId": "portal-admin",
+      "clientRoles": {
+        "realm-management": [
+          "manage-users",
+          "view-users",
+          "query-users",
+          "manage-realm",
+          "view-realm"
+        ]
+      }
+    }
+  ],
+  "clientScopeMappings": {
+    "realm-management": [
+      {
+        "client": "portal-admin",
+        "roles": [
+          "manage-users",
+          "view-users",
+          "query-users",
+          "manage-realm",
+          "view-realm"
+        ]
+      }
+    ]
+  }
+}

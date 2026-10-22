@@ -1,0 +1,185 @@
+# Operational windows and defaults. Data, not code: the day-count test never
+# looks in here, and changing a value is an edit in the admin, not a deploy.
+# Seeded into core.settings by migration core.0002; existing rows are not
+# overwritten.
+
+[settings."records.production_review_window_days"]
+value = 30
+description = "Days a new production may sit unreviewed before the request is marked production_unreviewed."
+
+[settings."records.followup_first_delay_days"]
+value = 5
+description = "Days after a deadline lapses before the first automatic follow-up."
+
+[settings."records.followup_interval_days"]
+value = 7
+description = "Days between automatic follow-ups of the same type on one request."
+
+[settings."org.name"]
+value = "Students' Civil Liberties Union"
+description = "Organization name used in outbound mail."
+
+[settings."org.default_display_timezone"]
+value = "America/Los_Angeles"
+description = "Time zone shown to a person who has not chosen one."
+
+[settings."records.default_sensitivity"]
+value = "internal"
+description = "Sensitivity given to a new request when the person making it does not choose one: public, internal or privileged."
+
+[settings."records.due_soon_window_days"]
+value = 7
+description = "How many days ahead Home looks for deadlines that are due soon."
+
+[settings."records.upload_max_file_bytes"]
+value = 104857600
+description = "The largest single file Add a document accepts, in bytes."
+
+[settings."records.upload_max_files"]
+value = 25
+description = "The most files one Add a document submission may carry."
+
+[settings."records.inbound_max_payload_bytes"]
+value = 62914560
+description = "The largest inbound mail delivery the webhook will read, in bytes. A larger one is kept without its attachments and flagged Attachment too large."
+
+[settings."records.inbound_date_window_hours"]
+value = 336
+description = "How long before it arrived a delivered message may say it was sent and still be believed. Older than this, it is dated when it arrived and flagged."
+
+[settings."core.system_mail_window_days"]
+value = 7
+description = "How many days back the System screen counts mail received."
+
+[settings."mail.undo_send_seconds"]
+value = 30
+description = "How long a message waits after Send is pressed before it goes, so it can be taken back."
+
+[settings."org.signature"]
+value = ""
+description = "Lines added under a person's name at the end of every message the portal sends: the organisation's name, address and phone."
+
+[settings."notifications.deadline_warning_days"]
+value = 3
+description = "How many days before a deadline the person it is assigned to is told about it."
+
+[settings."notifications.daily_summary_hour"]
+value = 7
+description = "The hour of the day, in each person's own time zone, at which the daily summary is sent."
+
+[settings."records.followups_send_enabled"]
+value = false
+description = "When on, an automatic follow-up is also sent to the agency's filing address, from the request's alias, with no undo window. Off, the follow-up only opens a task with the draft."
+
+[settings."records.followup_subject"]
+value = "Follow-up on our records request {tracking_number}"
+description = "The subject line of an automatic follow-up. Placeholders: {tracking_number}, {agency}, {subject}."
+
+[settings."records.followup_body"]
+value = "We are writing to follow up on our records request{reference}{sent_on}, \"{subject}\". We have not received a response by the date we were expecting one{expected_by}. Please let us know when we can expect it."
+description = "The body of an automatic follow-up. Placeholders: {tracking_number}, {agency}, {subject}, {reference} (\" (your reference X)\" or nothing), {sent_on} (\" sent on March 2, 2026\" or nothing), {expected_by} (\" of March 9, 2026\" or nothing), {deadline_kind}, {reply_to}. The person's signature block is added by the portal."
+
+[settings."core.presence_away_minutes"]
+value = 5
+description = "How long since a person's last heartbeat before \"who's online\" shows them as away."
+
+[settings."core.presence_gone_minutes"]
+value = 30
+description = "How long since a person's last heartbeat before they leave \"who's online\" altogether."
+
+[settings."org.legal_director"]
+value = ""
+description = "The person who is the organisation's legal director (their user id; empty: nobody named). They alone may read every team chat conversation, edits and deleted messages included, for discovery; every such read is in the activity log."
+
+[settings."org.short_name"]
+value = ""
+description = "The organisation's short name, used in file names such as the letter PDF's. Empty: the initials of the name."
+
+[settings."ai.general_provider"]
+value = "gemini"
+description = "Who runs the assistant's constant checks (does this message relate to its request, what kind is it): gemini, or off."
+
+[settings."ai.general_model"]
+value = "gemini-2.5-flash-lite"
+description = "The small model for the constant checks."
+
+[settings."ai.drafting_provider"]
+value = "claude_code"
+description = "Who runs the assistant's drafting and research: claude_code (Claude Code on this machine, one person only), anthropic (the Claude API), gemini, or off."
+
+[settings."ai.drafting_model"]
+value = ""
+description = "The model for drafting and research; empty means the provider's default."
+
+[settings."ai.claude_code_command"]
+value = "claude"
+description = "The Claude Code command the drafting provider runs, with its path when it is not on the PATH."
+
+[settings."ai.claude_code_allowed_tools"]
+value = ""
+description = "The tools Claude Code may use while drafting, comma-separated (the research plugins); empty means none."
+
+[settings."ai.exclude_privileged"]
+value = true
+description = "When on, nothing about a privileged request or a privileged draft is ever sent to the assistant."
+
+[settings."ai.keep_prompts"]
+value = false
+description = "When on, the full text sent to the assistant is kept with each run; off, only what was sent (names and sizes) is kept."
+
+[settings."ai.daily_run_limit"]
+value = 200
+description = "The most assistant runs allowed per day, across everyone."
+
+[settings."ai.house_style"]
+value = ""
+description = "Words the checks flag, one per line as from => to."
+
+
+[settings."records.docket_history_span"]
+value = 11
+description = "How many calendar dates the Docket's two sparklines (overdue and all open) look back over, ending today. At most 366."
+
+[settings."chat.attachment_max_bytes"]
+value = 26214400
+description = "The largest file a person may attach to a team chat message, in bytes."
+
+# P21c: the drafting tool (the SCLU fork of Mike). The secrets are the server's environment only.
+[settings."drafting.fork_enabled"]
+value = false
+description = "When on, letters are drafted in the drafting tool: stage 2 and Templates show its pages, reserving makes each agency's letter there, and filing takes the PDF from it. Needs the drafting tool's three secrets on the server; without them, or off, the portal's own editor is used."
+
+[settings."drafting.fork_api_url"]
+value = ""
+description = "The drafting tool's API as this server reaches it, for example http://backend:3001. Empty: the server's DRAFTING_API_URL."
+
+[settings."drafting.fork_web_url"]
+value = ""
+description = "The drafting tool's pages as a browser reaches them, for example https://portal.thesclu.org/draft. Empty: the server's DRAFTING_WEB_URL."
+
+[settings."drafting.fork_letterhead_id"]
+value = ""
+description = "The organisation's usual letterhead in the drafting tool (its id), given to a letter written from scratch. Empty: no letterhead."
+
+
+# P25a: the sign-in rules an administrator sets (Settings → System → Sign-in), written to Keycloak
+# through its admin API (portal/core/keycloak/policy.py). Product numbers, not legal ones.
+[settings."auth.session_hours"]
+value = 8
+description = "A sign-in ends after this many hours without use (the portal's and Keycloak's idle limit)."
+
+[settings."auth.session_max_hours"]
+value = 24
+description = "The longest a sign-in lasts, used or not, in hours; after it the password is asked for again."
+
+[settings."auth.reverify_hours"]
+value = 4
+description = "The portal asks for the passkey again once the last passkey check is this many hours old."
+
+[settings."auth.reverify_tool_minutes"]
+value = 30
+description = "Another application (the drafting tool, chat, the Mac app) asks for the passkey again when the last passkey check is older than this many minutes."
+
+[settings."auth.allow_authenticator_app"]
+value = true
+description = "On (the default; owner, 2026-10-20): the second step is a passkey or a code from an authenticator app, each person's choice when they first set it up (recovery codes are the backup either way). Off: passkeys only; someone who has only an app signs in once with a recovery code and adds a passkey."

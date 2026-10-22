@@ -1,0 +1,9 @@
+# Fixture calendar data for deadline_rules tests. Fictional jurisdiction "testland" under the
+# fictional law "TESTLAW" -- never a real jurisdiction, never a real holiday list.
+
+[calendar.testland]
+timezone = "America/New_York"
+holidays = [2026-01-13, 2026-11-11]
+
+[law.TESTLAW]
+calendar = "testland"

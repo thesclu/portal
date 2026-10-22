@@ -1,0 +1,19 @@
+# Fictional calendar data for the service-layer tests. Jurisdiction "testland" is invented and its
+# two holiday dates are invented; nothing here is a real jurisdiction or a real holiday.
+#
+# Why this file exists beside packages/deadline_rules/tests/fixtures/calendars_test.toml rather
+# than reusing it: that one puts testland in America/New_York, where 06:30 UTC is 01:30 the SAME
+# civil date. BUILD_PLAN's test_filing requires a filed_at of 06:30 UTC to land on the PREVIOUS
+# local date, which needs an offset greater than 6.5 hours. P1's fixtures are pinned by P1's own
+# tests, so this is a separate file rather than an edit to theirs.
+
+[calendar.testland]
+timezone = "America/Los_Angeles"
+holidays = [2026-01-13, 2026-11-11]
+
+[law.TESTLAW]
+calendar = "testland"
+
+# A law with a calendar but no rules at all: the "nobody has entered the clocks yet" case.
+[law.TESTLAW_NORULES]
+calendar = "testland"

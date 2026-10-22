@@ -1,0 +1,358 @@
+/*
+ * The design's tokens, value for value. Every colour, type size, space step, radius, border,
+ * shadow and motion value the portal uses is named here and nowhere else; a component uses the
+ * Tailwind names these generate and never a literal.
+ *
+ * The names are the design's own, from the design of record (v6: `new ui/v6/handoff/tokens/`):
+ * first the core of its `tokens.css` (ink, muted, hairline, page, card, brand, danger, warn, amber,
+ * ok …, the same core v3 had), then the names its export gave every literal the screens drew
+ * without a token (`tokens/raw-values.json`, matched by value: line-row, fill-skeleton, attention,
+ * shadow-field, ring-focus …). The pre-v3 names the early screens were written against (surface,
+ * accent, text-sm, rounded-card, shadow-pop …) were retired in P23c once nothing used them
+ * (DECISIONS 50). Two v6 names are the opposite of what the portal once called them: the shadow
+ * once named "panel" is v6's popover-2, and v6's "panel" is the one once named "popover". The few
+ * values v6 does not name are kept under "Not named in the design", each saying where it is drawn.
+ */
+@import 'tailwindcss';
+
+@theme {
+  /* ── Type ─────────────────────────────────────────────── */
+  --font-sans: 'DM Sans', system-ui, sans-serif;
+  --font-ui: 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Libre Franklin', sans-serif;
+  --font-letter: 'Times New Roman', Times, serif;
+  /* The handwritten stand-in for a signature not yet drawn (217, 008). */
+  --font-signature: 'Mrs Saint Delafield', cursive;
+
+  /* Tailwind's own type scale is cleared: v6 names 17, 19, 22 and 26 px text-lg, text-xl,
+   * text-2xl and text-3xl, and Tailwind's defaults for those names would add a line height the
+   * design never draws. No text size comes from anywhere but this file. */
+  --text-*: initial;
+  --text-10: 10px;
+  --text-105: 10.5px;
+  --text-11: 11px;
+  --text-115: 11.5px;
+  --text-12: 12px;
+  --text-125: 12.5px;
+  --text-13: 13px;
+  --text-135: 13.5px;
+  --text-14: 14px;
+  --text-16: 16px;
+  --text-18: 18px;
+  --text-32: 32px;
+  /* Named in the v6 export (raw-values.json). */
+  --text-micro: 7.5px; /* a file's tag (the Inbox) */
+  --text-tiny: 8.5px; /* a count badge (the Inbox) */
+  --text-xxs: 9.5px;
+  --text-md-lg: 15px; /* a card's or a section's title (013, 015, 217) */
+  --text-lg: 17px; /* the Inbox's empty and dialog titles */
+  --text-xl: 19px; /* the reading pane's title (the Inbox) */
+  --text-2xl: 22px; /* the Docket's stat boxes (025) */
+  --text-3xl: 26px;
+  --text-stat: 30px; /* the Docket's stat boxes (025) */
+  /* The signature in the stand-in hand: on the agreement's line (010), in the preview (008, 009),
+   * on the pad (008). */
+  --text-signature-sm: 42px;
+  --text-signature-md: 46px;
+  --text-signature-lg: 60px;
+  /* Not named in the design. */
+  --text-8: 8px; /* drawn in the v4 screens (P20b) */
+  --text-9: 9px; /* the drag handle beside an item on the letter (045) */
+  --text-20: 20px;
+  --text-24: 24px; /* a figure's tile in Reports (042) */
+
+  --leading-tight: 1.1;
+  --leading-ui: 1.35;
+  --leading-body: 1.55;
+  --leading-prose: 1.65;
+  --tracking-title: -0.02em;
+  --tracking-dialog: -0.01em;
+  --tracking-label: 0.07em;
+  --tracking-group: 0.08em;
+
+  /* ── Colour ───────────────────────────────────────────── */
+  --color-ink: #0b1f3a;
+  --color-ink-2: #4f5964;
+  --color-ink-3: #6b7480;
+  --color-muted: #878e98;
+  --color-muted-2: #a8b0ba;
+  --color-hairline: #edf0f3;
+  --color-line: #e4e7eb;
+  --color-line-2: #d5dbe2;
+  --color-page: #f4f6f9;
+  --color-page-2: #e8ebef;
+  --color-card: #fdfdfd;
+  --color-card-white: #ffffff;
+  --color-row-alt: #f5f6f8;
+  --color-hover: #eef1f4;
+
+  --color-brand: #0b4ea2;
+  --color-brand-tint: #eef3fa;
+  --color-brand-dark: #08356e;
+  --color-navy: #0a2447;
+
+  --color-danger: #b42318;
+  --color-danger-2: #a80d26;
+  --color-danger-tint: #fbeaec;
+  --color-warn: #9a4b12;
+  --color-warn-tint: #fdf1e7;
+  --color-amber: #7a5f00;
+  --color-amber-tint: #fdf6e3;
+  --color-ok: #1a5e43;
+  --color-ok-tint: #e8f2ee;
+  --color-ok-dot: #2e9e5b;
+  --color-purple: #5b3d9e;
+  --color-purple-tint: #f2ecfb;
+
+  /* Named in the v6 export (raw-values.json): each says where the screens draw it. */
+  --color-line-control: #c5cad2; /* checkbox and control outlines */
+  --color-line-row: #f1f3f5; /* the rule between rows inside a card (013) */
+  --color-line-row-2: #f4f6f8; /* the Calendar list's and the assign dialog's row rules (036, 038) */
+  --color-line-row-3: #f0f2f5; /* the rules in the notifications and task panels (121, 177) */
+  --color-line-list: #eaedf1; /* the rules between the Inbox's list rows (106) */
+  --color-line-underline: #cfd5dc; /* the underlined search on a list page (025, 039, 163, 173) */
+  --color-line-chip: #e6e9ed; /* a state banner's outline: closed, no deadline, privileged (078, 091–093) */
+  --color-line-chip-2: #e0e5ea; /* an attachment chip's outline (111, 149) */
+  --color-track: #dfe3e8; /* the setup's steps not reached yet (006–011) */
+  --color-surface-soft: #f7f9fb; /* a collapsed message, a chip's ground (062, 111) */
+  --color-surface-row: #fafbfc; /* weekend cells, day heads, list date heads, a latest-message card */
+  --color-surface-toolbar: #f9fafb; /* the attachment viewer's header (111) */
+  --color-fill-skeleton: #eef0f3; /* loading placeholders (031), the rule under a task group's heading (174) */
+  --color-fill-muted: #e9ecf0; /* the two rules behind "3 more" in a thread (062) */
+  --color-fill-subtle: #f1f3f6; /* a step not reached yet (125) */
+  --color-fill-subtle-2: #e8ecf0; /* the current tab in Settings' list (197) */
+  --color-fill-subtle-3: #e7ebf0; /* a top-bar icon button whose panel is open (016) */
+  --color-fill-subtle-4: #eceff3; /* the Calendar's Month · Week · List track (015) */
+  --color-ink-soft: #2b3a4f; /* the sender of a collapsed message (062) */
+  --color-text-placeholder: #9aa3ad; /* "Reply…", "Write a note…" (062, 066) */
+  --color-icon: #7b8794; /* a message's toolbar icons (062) */
+  --color-attention: #c2600f; /* the warning, withheld and fee icons (062), a conflicting date's dot (065) */
+  --color-blue-fill-strong: #c9d9ef; /* the Docket's "Due this week" bars, a day that is not today (025) */
+  --color-blue-tint-2: #eef4fd; /* a placeholder chip on the letter page (045) */
+  --color-blue-tint-3: #f6f9fd; /* the chosen person in "Assign several" (036) */
+  --color-blue-tint-4: #f4f8fd; /* a selected Docket row (028) */
+  --color-blue-tint-5: #f3f7fd; /* a draft's writing ground (118) */
+  --color-blue-tint-6: #eaf0f8; /* a channel's unread count (018) */
+  --color-blue-line-45: rgba(11, 78, 162, 0.45); /* the rule inside "Record event ▾" (062) */
+  --color-blue-line-2: #c9d8ee; /* the same rule while its menu is open (068) */
+  --color-blue-line-soft: #cddffa; /* a placeholder chip's outline on the letter page (045) */
+  --color-blue-text-muted: #6f93c4; /* the × of the "All mail" scope chip (153) */
+  --color-amber-text: #8a6100; /* the Docket's "Producing" dot count and "Due this week" chip (025, 032) */
+  --color-amber-dot: #e0a800;
+  --color-amber-dot-2: #d4a017; /* someone away's dot (018, 021) */
+  --color-amber-highlight: #fff1b8; /* a search hit in a result's snippet (153) */
+  --color-amber-tint-2: #fdf1c4; /* a search hit in a result row (041) */
+  --color-amber-tint-3: #fdf9f3; /* the offline banner (139) */
+  --color-amber-line: #f0dcc2;
+  --color-amber-ink-strong: #5c4700; /* a suggestion card's title (045) */
+  --color-red-tint-2: #fbeaea; /* the PDF tag on an attachment (062) */
+  --color-red-tint-3: #fdf3f4; /* an attachment over the limit (144) */
+  --color-red-line: #d9a3a9; /* a field's outline in error (001) */
+  --color-red-line-soft: #f2c6cc;
+  --color-red-ink-strong: #8a0a1f; /* a likely fight's title (045) */
+  --color-green-line: #cde5d8; /* a completed task's box (173, 179) */
+  --color-green-tint-2: #eaf2e9; /* the new address in "Review before resending" (126) */
+  --color-success-ink: #1a7f4b; /* a finished step in fix and resend (126) */
+  --color-success-ink-2: #1a7a4c; /* "Delivered to …" (116, 128) */
+  --color-success-track: #e3efe8; /* the Done ring before it fills (012) */
+  --color-avatar-green: #2e7d4f; /* the person's initials on the welcome (006), a healthy line's dot on System (199) */
+  --color-avatar-orange: #b4531f; /* a person's initials (018) */
+  --color-avatar-purple: #6b3fc0; /* a person's initials (018) */
+  --color-signature-ink: #1f3566; /* a signature in the stand-in hand (217, 008) */
+  --color-letter-ink: #111111; /* a letter's words on its page (187, 217) */
+  /* Not named in the design. */
+  --color-message-line: #e3e7ec; /* a message card's outline (v6 tokens.css draws it as a literal) */
+
+  /* ── Space and sizes ──────────────────────────────────── */
+  --spacing-rail: 256px;
+  /* 64 px as the new-request screens draw the collapsed sidebar (044–061); P20a had 62 from
+   * ARCHITECTURE §2.1's words, before any screen drew it. */
+  --spacing-rail-collapsed: 64px;
+  --spacing-topbar: 56px;
+  --spacing-search: 460px;
+  --spacing-detail: 330px;
+  --spacing-artboard: 1440px;
+  /* Not named in the design: the letter page as stage 2 draws it (045: 660 px of text inside 62 px
+   * sides, content-box, so 784 px across) and as stage 4's packet draws it (049: 430 + 2 × 40). */
+  --spacing-letter: 784px;
+  --spacing-letter-mini: 510px;
+
+  /* ── Radius ───────────────────────────────────────────── */
+  --radius-4: 4px;
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-9: 9px;
+  --radius-10: 10px;
+  --radius-12: 12px;
+  --radius-14: 14px;
+  --radius-16: 16px;
+  --radius-18: 18px;
+  --radius-pill: 999px;
+  /* Named in the v6 export (raw-values.json). */
+  --radius-2xs: 2px; /* stage 4's filing bar (049) */
+  --radius-xs: 3px; /* a file's tag (062, 106) */
+  --radius-kbd: 5px; /* a keyboard hint beside a search (025, 039) */
+  --radius-chip: 7px; /* calendar week entries (037) */
+
+  /* ── Shadow ───────────────────────────────────────────── */
+  --shadow-card: 0 1px 2px rgba(11, 31, 58, 0.05);
+  --shadow-float: 0 6px 24px -6px rgba(11, 31, 58, 0.1), 0 1px 3px rgba(11, 31, 58, 0.03);
+  --shadow-menu: 0 12px 28px rgba(11, 31, 58, 0.14);
+  --shadow-dialog: 0 24px 60px -12px rgba(11, 31, 58, 0.22), 0 2px 6px rgba(11, 31, 58, 0.05);
+  --shadow-frame: 0 1px 2px rgba(11, 31, 58, 0.03), 0 10px 30px rgba(11, 31, 58, 0.06);
+  --shadow-glass: 0 1px 2px rgba(11, 31, 58, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  /* Named in the v6 export (raw-values.json). */
+  --shadow-field:
+    0 4px 16px -6px rgba(11, 31, 58, 0.1), 0 1px 3px rgba(11, 31, 58, 0.04); /* a raised field (every dialog) */
+  --shadow-field-soft: 0 4px 16px -6px rgba(11, 31, 58, 0.08), 0 1px 3px rgba(11, 31, 58, 0.04);
+  --shadow-field-hover:
+    0 4px 16px -6px rgba(11, 31, 58, 0.12), 0 1px 3px rgba(11, 31, 58, 0.05); /* team chat's composer (019) */
+  --shadow-primary:
+    0 4px 16px -6px rgba(11, 78, 162, 0.28), 0 1px 3px rgba(11, 78, 162, 0.12); /* a focused raised field (001, 002, 004) */
+  --shadow-raised-soft:
+    0 6px 24px -6px rgba(11, 31, 58, 0.08), 0 1px 3px rgba(11, 31, 58, 0.03); /* a draft (118) */
+  --shadow-raised-strong:
+    0 6px 24px -8px rgba(11, 31, 58, 0.22), 0 1px 3px rgba(11, 31, 58, 0.06); /* the signature's preview page (217) */
+  --shadow-panel:
+    0 20px 48px -8px rgba(11, 31, 58, 0.24), 0 4px 12px rgba(11, 31, 58, 0.08); /* a top-bar panel (016, 018) */
+  --shadow-popover: 0 14px 34px rgba(11, 31, 58, 0.16); /* "Resent · Undo" (127), "Reply sent" (151) */
+  --shadow-popover-2: 0 14px 34px rgba(11, 31, 58, 0.14); /* the notifications panel (121) */
+  --shadow-popover-3: 0 16px 40px rgba(11, 31, 58, 0.18); /* the New task popover (183) */
+  --shadow-popover-lg: 0 20px 50px rgba(11, 31, 58, 0.18); /* the Inbox's dialogs (159) */
+  --shadow-page: 0 2px 18px rgba(11, 31, 58, 0.1); /* a letter's page (045) */
+  --shadow-sm: 0 2px 12px rgba(11, 31, 58, 0.09); /* the letter in stage 4's packet (049) */
+  --shadow-sm-4: 0 2px 14px rgba(11, 31, 58, 0.14); /* the page in the viewer (111) */
+  --shadow-sm-5: 0 2px 14px rgba(11, 31, 58, 0.1); /* the letter being reviewed (187) */
+  --shadow-xs: 0 1px 2px rgba(11, 31, 58, 0.06); /* a segmented choice's chosen face */
+  --shadow-xs-2: 0 1px 2px rgba(11, 31, 58, 0.08);
+  --shadow-ring-hairline: inset 0 0 0 1px rgba(11, 31, 58, 0.09); /* a message's toolbar (062) */
+  --shadow-ring-focus: 0 0 0 3px rgba(11, 78, 162, 0.1); /* a composer being written in (144) */
+  --shadow-ring-focus-strong: 0 0 0 3px rgba(11, 78, 162, 0.12); /* a focused field */
+  --shadow-ring-focus-strongest: 0 0 0 3px rgba(11, 78, 162, 0.18); /* "＋ New task" while open (183) */
+  --shadow-ring-avatar: 0 0 0 2px #fff; /* the access avatars' white ring (231) */
+  --shadow-ring-grey: 0 0 0 4px #dde2e8; /* the ring round a hovered item icon (064) */
+  --shadow-setup-card:
+    0 20px 48px -12px rgba(11, 31, 58, 0.16), 0 2px 6px rgba(11, 31, 58, 0.04); /* the setup's card (006–012) */
+  /* Not named in the design. */
+  --shadow-apply: 0 1px 2px rgba(11, 78, 162, 0.25); /* a suggestion card's Apply (045) */
+
+  /* ── Motion ───────────────────────────────────────────── */
+  --ease-fast: ease-out;
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 260ms;
+  /* The new-user setup's Done (012), P20i: the design's --setup-done-cycle, the check popping in
+   * and drawing (to 20 %), the ring filling (20–66 %, 1.5 s), the card fading (68–78 %), played
+   * once; Home opens as the card has faded. With reduced motion the base rule below stops every
+   * animation, which leaves each at its finished state. */
+  --setup-done-cycle: 3.4s;
+  --animate-setup-card: setup-card var(--setup-done-cycle) cubic-bezier(0.4, 0, 0.2, 1) both;
+  --animate-setup-pop: setup-pop var(--setup-done-cycle) cubic-bezier(0.4, 0, 0.2, 1) both;
+  --animate-setup-check: setup-check var(--setup-done-cycle) cubic-bezier(0.4, 0, 0.2, 1) both;
+  --animate-setup-ring: setup-ring var(--setup-done-cycle) cubic-bezier(0.4, 0, 0.2, 1) both;
+  @keyframes setup-card {
+    0% {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    6%,
+    68% {
+      opacity: 1;
+      transform: none;
+    }
+    78%,
+    100% {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+    }
+  }
+  @keyframes setup-pop {
+    0% {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+    9% {
+      transform: scale(1.06);
+      opacity: 1;
+    }
+    14%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+  @keyframes setup-check {
+    0%,
+    8% {
+      stroke-dashoffset: 22;
+    }
+    20%,
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes setup-ring {
+    0%,
+    20% {
+      stroke-dashoffset: 188.5;
+    }
+    66%,
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+}
+
+/* The glass search and composers: not a Tailwind token shape, so a utility. */
+@utility glass {
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: var(--shadow-glass);
+  backdrop-filter: blur(14px) saturate(1.4);
+  -webkit-backdrop-filter: blur(14px) saturate(1.4);
+}
+
+/* The dialog scrim. */
+@utility scrim {
+  background: rgba(11, 31, 58, 0.28);
+}
+
+/* Base rules sit in the base layer so a utility on an element always wins over them. */
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-page);
+    color: var(--color-ink);
+    font-family: var(--font-ui);
+    font-size: var(--text-13);
+    line-height: var(--leading-ui);
+    font-variant-numeric: tabular-nums;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: var(--color-brand);
+  }
+  a:hover {
+    color: var(--color-brand-dark);
+  }
+
+  /* One focus ring for everything a keyboard can reach. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}

@@ -1,0 +1,8 @@
+/*
+ * The sign-in pages are drawn with the portal's own tokens (copied from frontend/src/design/tokens.css
+ * by scripts/portal-assets.mjs) and its self-hosted fonts, so the portal's utility classes mean the
+ * same here. Nothing is fetched from anywhere but Keycloak itself.
+ */
+@import 'tailwindcss';
+@import '../portal/tokens.css';
+@import '../portal/fonts.css';

@@ -1,0 +1,59 @@
+{
+  "FromName": "Records Unit",
+  "From": "records@agency.example.org",
+  "FromFull": {
+    "Email": "Records@Agency.Example.org",
+    "Name": "Records Unit",
+    "MailboxHash": ""
+  },
+  "To": "\"SCLU\" <ALIAS_PLACEHOLDER>",
+  "ToFull": [
+    {
+      "Email": "ALIAS_PLACEHOLDER",
+      "Name": "SCLU",
+      "MailboxHash": ""
+    }
+  ],
+  "Cc": "",
+  "CcFull": [],
+  "Bcc": "",
+  "BccFull": [],
+  "OriginalRecipient": "ALIAS_PLACEHOLDER",
+  "ReplyTo": "",
+  "Subject": "RE: Records request",
+  "MessageID": "00000000-aaaa-4bbb-8ccc-000000000001",
+  "Date": "Mon, 2 Mar 2026 09:30:00 -0800",
+  "MailboxHash": "",
+  "TextBody": "We acknowledge receipt of your request.\n\nRecords Unit",
+  "HtmlBody": "<html><body><p>We acknowledge receipt of your request.</p><p>Records Unit</p></body></html>",
+  "StrippedTextReply": "We acknowledge receipt of your request.",
+  "Tag": "",
+  "Headers": [
+    {
+      "Name": "Message-ID",
+      "Value": "<reply-1@agency.example.org>"
+    },
+    {
+      "Name": "In-Reply-To",
+      "Value": "<original-1@requests.example.test>"
+    },
+    {
+      "Name": "References",
+      "Value": "<original-0@requests.example.test> <original-1@requests.example.test>"
+    },
+    {
+      "Name": "X-Spam-Status",
+      "Value": "No"
+    }
+  ],
+  "Attachments": [
+    {
+      "Name": "acknowledgment.txt",
+      "Content": "UmVjZWl2ZWQuIFRoYW5rIHlvdS4K",
+      "ContentType": "text/plain",
+      "ContentLength": 21,
+      "ContentID": ""
+    }
+  ],
+  "MessageStream": "inbound"
+}

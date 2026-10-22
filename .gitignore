@@ -1,0 +1,18 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+var/
+frontend/node_modules/
+frontend/dist/
+.DS_Store
+
+# Local agent/editor tooling — not published
+.claude/
+
+# P25a: the sign-in theme (keycloak/theme) builds here; the jar goes to var/keycloak/providers.
+keycloak/theme/node_modules/
+keycloak/theme/dist*
